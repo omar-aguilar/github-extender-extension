@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "Github Extender Extension",
+  "description": "",
+  "version": "",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "https://*/"
+  ]
+}
