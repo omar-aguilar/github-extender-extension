@@ -23,16 +23,17 @@
 (() => {
   [...document.getElementsByClassName('muted-link tooltipped tooltipped-s')]
     .forEach((elem) => {
-      const customElem = elem; // trick eslint :P
       const counterClassName = 'github-extension-counter-label';
       const label = elem.getAttribute('aria-label');
       const [nApprovals] = label.match(/(\d+)/) || [];
       if (nApprovals) {
         const [counterSpan] = elem.getElementsByClassName(counterClassName);
         const spanElem = counterSpan || document.createElement('span');
+        if (!counterSpan) {
+          elem.appendChild(spanElem);
+        }
         spanElem.className = counterClassName;
         spanElem.innerText = `(${nApprovals})`;
-        customElem.innerHTML = `${elem.innerText} ${spanElem.outerHTML}`;
       }
     });
 })();

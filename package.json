@@ -7,7 +7,7 @@
     "watch": "NODE_ENV=development webpack --watch",
     "build-dev": "NODE_ENV=development webpack",
     "build-prod": "NODE_ENV=production webpack",
-    "lint": "eslint --color"
+    "lint": "eslint --color src"
   },
   "keywords": [
     "github",
