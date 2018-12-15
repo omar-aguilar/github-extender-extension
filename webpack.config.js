@@ -8,20 +8,37 @@ const paths = {
   src: path.join(__dirname, 'src'),
   popup: path.join(__dirname, 'src', 'popup'),
   background: path.join(__dirname, 'src', 'background'),
+  contentScripts: path.join(__dirname, 'src', 'contentScripts'),
   output: path.join(__dirname, 'dist'),
 };
 
-const backgroundEntries = {};
-fs.readdirSync(paths.background)
-  .filter(file => file.includes('.js') && (!file.includes('index') && !fs.lstatSync(path.join(paths.background, file)).isDirectory()))
-  .map(file => ([file.replace(/\.js$/, ''), path.join(paths.background, file)]))
-  .forEach(([entryName, entryPath]) => { backgroundEntries[entryName] = entryPath; });
+const contentScriptsEntries = {};
+const contentScriptsManifest = [];
+fs.readdirSync(paths.contentScripts)
+  .map((dir) => {
+    const dirPath = path.join(paths.contentScripts, dir);
+    if (fs.lstatSync(dirPath).isDirectory()) {
+      return [dir, dirPath];
+    }
+    return null;
+  })
+  .filter(dirPath => dirPath)
+  .forEach((contentScript) => {
+    const [name, dirPath] = contentScript;
+    const config = require(path.join(dirPath, 'config')); // eslint-disable-line global-require, import/no-dynamic-require
+    const scriptName = `content_scripts/${name}`;
+    contentScriptsEntries[scriptName] = dirPath;
+    contentScriptsManifest.push({
+      ...config,
+      js: [`${scriptName}.js`],
+    });
+  });
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
   devtool: 'inline-source-map',
   entry: Object.assign(
-    backgroundEntries,
+    contentScriptsEntries,
     {
       popup: paths.popup,
       background: paths.background,
@@ -47,6 +64,9 @@ module.exports = {
             {
               description: process.env.npm_package_description,
               version: process.env.npm_package_version,
+              content_scripts: [
+                ...contentScriptsManifest,
+              ],
             },
           ),
           null,

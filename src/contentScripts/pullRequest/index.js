@@ -1,13 +1,9 @@
-// Pulls Screen
-/**
- * NOTE: As this screen gets executed every time a change is made to the url
- * we cannot make const functions as it will raise an error as the variable will
- * be defined since the first run.
- */
-
-// Mark PR title doesn't match
-(() => {
-  const prTitleRegEx = /^(?:\[[A-Za-z0-9]+-[A-Za-z0-9]+\])+\s[A-Z]|Release \d+\.\d+\.\d+/;
+// Mark PR whose title doesn't match certain Regex
+const markIncorrectPRTitles = ({ titleRegEx } = {}) => {
+  if (!titleRegEx) {
+    return;
+  }
+  const prTitleRegEx = new RegExp(titleRegEx);
   [...document.getElementsByClassName('link-gray-dark v-align-middle no-underline h4 js-navigation-open')]
     .forEach((elem) => {
       const title = elem.innerText;
@@ -17,10 +13,10 @@
         prLine.style.backgroundColor = backgroundColor;
       }
     });
-})();
+};
 
 // Add number of Approvals / Change Requested / etc.
-(() => {
+const addNumberOfChanges = () => {
   [...document.getElementsByClassName('muted-link tooltipped tooltipped-s')]
     .forEach((elem) => {
       const counterClassName = 'github-extension-counter-label';
@@ -36,4 +32,28 @@
         spanElem.innerText = `(${nApprovals})`;
       }
     });
-})();
+};
+
+const refresh = (params) => {
+  markIncorrectPRTitles(params);
+  addNumberOfChanges();
+};
+
+const messageListener = (request, sender, sendResponse) => {
+  console.log('request', request);
+  console.log('sender', sender);
+  const { pr } = request;
+  if (pr) {
+    if (pr.refresh) {
+      refresh(pr.refresh);
+      sendResponse({
+        pr: {
+          refreshed: true,
+        },
+      });
+    }
+  }
+};
+
+chrome.runtime.onMessage.addListener(messageListener);
+refresh();
