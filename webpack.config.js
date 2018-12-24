@@ -3,6 +3,7 @@ const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const paths = {
   src: path.join(__dirname, 'src'),
@@ -31,12 +32,13 @@ fs.readdirSync(paths.contentScripts)
     contentScriptsManifest.push({
       ...config,
       js: [`${scriptName}.js`],
+      css: [`${scriptName}.css`],
     });
   });
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   entry: Object.assign(
     contentScriptsEntries,
     {
@@ -44,6 +46,46 @@ module.exports = {
       background: paths.background,
     },
   ),
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: [/node_modules/],
+        include: [paths.popup],
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+      {
+        test: /\.css$/,
+        // include: [paths.contentScripts],
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              localIdentName: '[path]__[local]___[md5:hash:hex:5]',
+              modules: true,
+            },
+          },
+        ],
+      },
+      // {
+      //   test: /\.css$/,
+      //   include: [paths.popup],
+      //   use: [
+      //     'style-loader',
+      //     {
+      //       loader: 'css-loader',
+      //       options: {
+      //         localIdentName: '[path]__[local]___[md5:hash:hex:5]',
+      //         modules: true,
+      //       },
+      //     },
+      //   ],
+      // },
+    ],
+  },
   output: {
     path: paths.output,
     filename: '[name].js',
@@ -51,10 +93,12 @@ module.exports = {
   resolve: {
     modules: [
       paths.src,
+      'node_modules',
     ],
+    extensions: ['*', '.js', '.jsx'],
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin([paths.output]),
     new CopyWebpackPlugin([
       {
         from: `${paths.src}/manifest.json`,
@@ -74,6 +118,9 @@ module.exports = {
         ),
       },
     ]),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+    }),
     new HtmlWebpackPlugin({
       template: `${paths.popup}/popup.html`,
       filename: 'popup.html',

@@ -1,0 +1,28 @@
+:global(*) {
+  font-family: 'Roboto Mono', monospace !important;
+}
+
+:global(body) {
+  margin: 0;
+  width: 600px;
+}
+
+.container {
+  padding: 8px;
+}
+
+.tabContent {
+  margin: 8px 0;
+  overflow: auto;
+  height: 400px;
+  max-height: 400px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footer button:not(:last-child) {
+  margin-right: 10px;
+}
