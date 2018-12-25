@@ -8,8 +8,8 @@ const repoConfig = () => {
   return Joi.array().items(RepoConfig).min(1);
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export const isValidJSON = (value) => {
+
+const isValidJSON = (value) => {
   const schema = repoConfig();
   const { error } = Joi.validate(value, schema);
   if (error) {
@@ -21,4 +21,8 @@ export const isValidJSON = (value) => {
   return {
     valid: true,
   };
+};
+
+export {
+  isValidJSON, // eslint-disable-line import/prefer-default-export
 };

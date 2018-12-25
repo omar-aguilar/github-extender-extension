@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-class HandlerInterface {
+class PageManagerHandlerInterface {
   onPageUpdate(send, tab, urlMeta, config) {
     throw Error('"onPageUpdate" method must be implemented');
   }
@@ -10,4 +10,4 @@ class HandlerInterface {
   }
 }
 
-export default HandlerInterface;
+export default PageManagerHandlerInterface;

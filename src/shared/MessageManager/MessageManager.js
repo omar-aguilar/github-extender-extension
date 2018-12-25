@@ -2,12 +2,13 @@ class MessageManager {
   constructor() {
     this.subscribers = [];
     this._onMessageReceived = this._onMessageReceived.bind(this);
+    this.send = this.send.bind(this);
   }
 
-  subscribe(callback) {
-    const alreadySubscribed = this.subscribers.some(subscriber => subscriber === callback);
+  subscribe(handler) {
+    const alreadySubscribed = this.subscribers.some(subscriber => subscriber === handler);
     if (!alreadySubscribed) {
-      this.subscribers.push(callback);
+      this.subscribers.push(handler);
     }
   }
 
@@ -15,7 +16,7 @@ class MessageManager {
     if (chrome.runtime.lastError) {
       return;
     }
-    this.subscribers.forEach(callback => callback(tab, message));
+    this.subscribers.forEach(handler => handler.onMessage(tab, message));
   }
 
   send(tab, message) {

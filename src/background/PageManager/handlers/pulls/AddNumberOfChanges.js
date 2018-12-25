@@ -1,6 +1,6 @@
-import HandlerInterface from '../HandlerInterface';
+import PageManagerHandlerInterface from '../../PageManagerHandlerInterface';
 
-class AddNumberOfChanges extends HandlerInterface {
+class AddNumberOfChanges extends PageManagerHandlerInterface {
   onPageUpdate(send, tab, urlMeta) {
     const message = {
       [urlMeta.page]: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import md5 from 'md5';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Tabs from '@material-ui/core/Tabs';
@@ -16,10 +17,7 @@ class App extends React.Component {
     this.state = {
       selectedTabIdx: 0,
       repoConfigItems: [],
-      initConfig: {
-        repoConfig: [],
-        globalConfig: {},
-      },
+      configHash: '',
       config: {
         repoConfig: [],
         globalConfig: {},
@@ -39,7 +37,8 @@ class App extends React.Component {
       .then(({ config }) => {
         if (config) {
           const repoConfigItems = Array(config.repoConfig.length).fill(true);
-          this.setState({ initConfig: config, repoConfigItems });
+          const configHash = md5(JSON.stringify(config));
+          this.setState({ configHash, config, repoConfigItems });
         }
       });
   }
@@ -47,12 +46,12 @@ class App extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     const {
       repoConfigItems,
-      initConfig,
+      configHash,
       selectedTabIdx,
       config,
     } = this.state;
     return repoConfigItems !== nextState.repoConfigItems
-      || initConfig !== nextState.initConfig
+      || configHash !== nextState.configHash
       || selectedTabIdx !== nextState.selectedTabIdx
       || config.globalConfig !== nextState.config.globalConfig;
   }
@@ -104,25 +103,20 @@ class App extends React.Component {
 
   saveChanges() {
     const { setKey } = this.props;
-    const { config, initConfig, repoConfigItems } = this.state;
+    const { config, repoConfigItems } = this.state;
     const { repoConfig } = config;
-    const { repoConfig: initRepoConfig } = initConfig;
     const newRepoConfig = repoConfigItems.map((active, idx) => {
       if (!active) {
         return null;
       }
-      const val = repoConfig[idx] || {};
-      const initVal = initRepoConfig[idx] || {};
       return {
-        ...initVal,
-        ...val,
+        ...(repoConfig[idx] || {}),
       };
     })
       .filter(value => value)
       .filter(value => value.owner && value.config);
     const newConfig = {
       globalConfig: {
-        ...initConfig.globalConfig,
         ...config.globalConfig,
       },
       repoConfig: newRepoConfig,
@@ -134,7 +128,6 @@ class App extends React.Component {
     const {
       selectedTabIdx,
       repoConfigItems,
-      initConfig,
       config,
     } = this.state;
     return (
@@ -157,7 +150,7 @@ class App extends React.Component {
                   key={`repoConfig-${(idx + 0)}`}
                   onDelete={onDelete}
                   onUpdateStore={onUpdateStore}
-                  value={config.repoConfig[idx] || initConfig.repoConfig[idx]}
+                  value={config.repoConfig[idx]}
                 />
               );
             })}
@@ -169,7 +162,7 @@ class App extends React.Component {
               type="text"
               label="Github Token"
               fullWidth
-              value={config.globalConfig.githubToken || initConfig.globalConfig.githubToken}
+              value={config.globalConfig.githubToken}
               onChange={(event) => {
                 this.onUpdateGlobalConfig({ githubToken: event.target.value });
               }}

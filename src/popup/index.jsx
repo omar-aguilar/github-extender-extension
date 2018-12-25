@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
+import StorageManager from 'shared/StorageManager';
 import App from './App';
-import StorageManager from '../background/StorageManager';
 
 const storageManager = new StorageManager();
 const getKey = storageManager.getKey.bind(storageManager);

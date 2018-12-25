@@ -1,19 +1,11 @@
-import HandlerInterface from '../HandlerInterface';
-import PageManager from '../../PageManager';
-import StorageManager from '../../StorageManager';
+import PageManagerHandlerInterface from '../../PageManagerHandlerInterface';
+import { getGithubUrlMeta } from '../../utils';
 
-class GetPRStatus extends HandlerInterface {
-  constructor() {
+class GetPRStatus extends PageManagerHandlerInterface {
+  constructor(config) {
     super();
-    this.token = null;
-    const storageManager = new StorageManager();
-    this._updateToken = this._updateToken.bind(this);
-    storageManager.getKey('config').then(this._updateToken);
-  }
-
-  _updateToken({ config = {} }) {
-    const { globalConfig = {} } = config;
-    this.token = globalConfig.githubToken;
+    this.globalConfig = config.globalConfig || {};
+    this.token = this.globalConfig.githubToken;
   }
 
   _getData(repo, owner, path) {
@@ -141,7 +133,7 @@ class GetPRStatus extends HandlerInterface {
     if (url.search && !url.search.includes('open')) {
       return;
     }
-    const { owner, repo } = PageManager.getGithubUrlMeta(url.pathname);
+    const { owner, repo } = getGithubUrlMeta(url.pathname);
     this._getOpenPRsInfo(owner, repo)
       .then(this._processPRInfo)
       .then(this._getPRBlockStatus)

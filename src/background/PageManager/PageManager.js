@@ -1,23 +1,14 @@
-import MessageManager from './MessageManager';
-import StorageManager from './StorageManager';
+import { MessageManagerHandlerInterface } from 'shared/MessageManager';
+import { getGithubUrlMeta } from './utils';
 
-class PageManager {
-  constructor() {
+class PageManager extends MessageManagerHandlerInterface {
+  constructor(config, send) {
+    super();
     this.pageUpdateTopics = {};
     this.messageTopics = {};
-    this.config = {};
-
-    this._onMessageReceived = this._onMessageReceived.bind(this);
-    this.messageManager = new MessageManager();
-    this.messageManager.subscribe(this._onMessageReceived);
-
-    this._updateConfig = this._updateConfig.bind(this);
-    this.storageManager = new StorageManager();
-    this.storageManager.getKey('config').then(this._updateConfig);
-  }
-
-  _updateConfig({ config = {} }) {
-    this.config = config.repoConfig || {};
+    this.config = config.repoConfig || [];
+    this.globalConfig = config.globalConfig || {};
+    this.send = send;
   }
 
   _getConfigFor(owner, repo) {
@@ -32,16 +23,6 @@ class PageManager {
     }
   }
 
-  static getGithubUrlMeta(url) {
-    const [, owner, repo, page, ...section] = url.split('/');
-    return {
-      owner,
-      repo,
-      page,
-      section,
-    };
-  }
-
   subscribe(type = 'page', topic, handler) {
     const topics = type === 'message' ? this.messageTopics : this.pageUpdateTopics;
     if (!topics[topic]) {
@@ -50,16 +31,16 @@ class PageManager {
     topics[topic].push(handler);
   }
 
-  _onMessageReceived(tab, message) {
+  onMessage(tab, message) {
     const url = new URL(tab.url);
     if (url.hostname !== 'github.com') {
       return;
     }
-    const urlMeta = this.constructor.getGithubUrlMeta(url.pathname);
+    const urlMeta = getGithubUrlMeta(url.pathname);
     const config = this._getConfigFor(urlMeta.owner, urlMeta.repo);
     const topic = this.messageTopics[urlMeta.page];
     if (topic) {
-      const send = this.messageManager.send.bind(this.messageManager, tab);
+      const send = this.send.bind(null, tab);
       topic.forEach(handler => handler.onMessage(send, tab, urlMeta, config, message));
     }
   }
@@ -69,12 +50,12 @@ class PageManager {
     if (url.hostname !== 'github.com') {
       return;
     }
-    const urlMeta = this.constructor.getGithubUrlMeta(url.pathname);
+    const urlMeta = getGithubUrlMeta(url.pathname);
     const config = this._getConfigFor(urlMeta.owner, urlMeta.repo);
     const topicName = urlMeta.page;
     const topic = this.pageUpdateTopics[topicName];
     if (topic) {
-      const send = this.messageManager.send.bind(this.messageManager, tab);
+      const send = this.send.bind(null, tab);
       topic.forEach(handler => handler.onPageUpdate(send, tab, urlMeta, config));
     }
   }

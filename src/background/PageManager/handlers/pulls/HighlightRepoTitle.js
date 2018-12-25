@@ -1,6 +1,6 @@
-import HandlerInterface from '../HandlerInterface';
+import PageManagerHandlerInterface from '../../PageManagerHandlerInterface';
 
-class HighlightPRTitle extends HandlerInterface {
+class HighlightPRTitle extends PageManagerHandlerInterface {
   onPageUpdate(send, tab, urlMeta, config) {
     const { titleRegEx } = config;
     const message = {
