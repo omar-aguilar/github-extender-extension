@@ -128,7 +128,10 @@ class GetPRStatus extends PageManagerHandlerInterface {
     });
   }
 
-  onPageUpdate(send, tab, urlMeta) {
+  onPageUpdate(send, tab, urlMeta, config) {
+    if (!config.blockPRs) {
+      return;
+    }
     const url = new URL(tab.url);
     if (url.search && !url.search.includes('open')) {
       return;

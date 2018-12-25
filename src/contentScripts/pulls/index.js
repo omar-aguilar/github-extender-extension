@@ -8,7 +8,6 @@ const highlightPRTitle = (titleRegEx) => {
     return;
   }
   const prTitleRegEx = new RegExp(titleRegEx);
-  console.log('prTitleRegEx', prTitleRegEx, titleRegEx, prTitleRegEx.test('[DPP-301] A'));
   [...document.getElementsByClassName(prSelector)]
     .forEach((elem) => {
       const title = elem.innerText;

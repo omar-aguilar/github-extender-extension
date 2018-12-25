@@ -4,6 +4,7 @@ const repoConfig = () => {
   const RepoConfig = Joi.object().keys({
     repo: Joi.string().required(),
     titleRegEx: Joi.string(),
+    blockPRs: Joi.boolean(),
   });
   return Joi.array().items(RepoConfig).min(1);
 };
