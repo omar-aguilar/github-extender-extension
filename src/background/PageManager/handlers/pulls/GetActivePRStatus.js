@@ -128,6 +128,9 @@ class GetPRStatus extends PageManagerHandlerInterface {
     });
   }
 
+  /**
+   * @override
+   */
   onPageUpdate(send, tab, urlMeta, config) {
     if (!config.blockPRs) {
       return;

@@ -7,7 +7,6 @@ class PageManager extends MessageManagerHandlerInterface {
     this.pageUpdateTopics = {};
     this.messageTopics = {};
     this.config = config.repoConfig || [];
-    this.globalConfig = config.globalConfig || {};
     this.send = send;
   }
 
@@ -31,6 +30,9 @@ class PageManager extends MessageManagerHandlerInterface {
     topics[topic].push(handler);
   }
 
+  /**
+   * @override
+   */
   onMessage(tab, message) {
     const url = new URL(tab.url);
     if (url.hostname !== 'github.com') {

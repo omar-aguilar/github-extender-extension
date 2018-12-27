@@ -1,6 +1,9 @@
 import PageManagerHandlerInterface from '../../PageManagerHandlerInterface';
 
 class HighlightPRTitle extends PageManagerHandlerInterface {
+  /**
+   * @override
+   */
   onPageUpdate(send, tab, urlMeta, config) {
     const { titleRegEx } = config;
     const message = {
