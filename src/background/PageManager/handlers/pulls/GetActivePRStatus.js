@@ -4,8 +4,8 @@ import { getGithubUrlMeta } from '../../utils';
 class GetPRStatus extends PageManagerHandlerInterface {
   constructor(config) {
     super();
-    this.globalConfig = config.globalConfig || {};
-    this.token = this.globalConfig.githubToken;
+    const globalConfig = config.globalConfig || {};
+    this.token = globalConfig.githubToken;
   }
 
   _getData(repo, owner, path) {
@@ -126,6 +126,14 @@ class GetPRStatus extends PageManagerHandlerInterface {
         isBlocked,
       };
     });
+  }
+
+  /**
+   * @override
+   */
+  onKeyUpdated(config) {
+    const globalConfig = config.globalConfig || {};
+    this.token = globalConfig.githubToken;
   }
 
   /**

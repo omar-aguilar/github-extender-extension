@@ -33,6 +33,13 @@ class PageManager extends MessageManagerHandlerInterface {
   /**
    * @override
    */
+  onKeyUpdated(config) {
+    this.config = config.repoConfig || [];
+  }
+
+  /**
+   * @override
+   */
   onMessage(tab, message) {
     const url = new URL(tab.url);
     if (url.hostname !== 'github.com') {
