@@ -21,9 +21,9 @@ storageManager.getKey('config').then(({ config = {} }) => {
   pageManager.subscribe('page', 'pulls', new AddNumberOfChanges());
   pageManager.subscribe('page', 'pulls', new HighlightRepoTitle());
 
-  // chrome.tabs.onCreated.addListener((tab) => {
-  //   pageManager.onPageUpdateReceived(tab);
-  // });
+  chrome.tabs.onCreated.addListener((tab) => {
+    pageManager.onPageUpdateReceived(tab);
+  });
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
       pageManager.onPageUpdateReceived(tab);
