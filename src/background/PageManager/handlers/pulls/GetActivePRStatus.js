@@ -91,6 +91,8 @@ class GetPRStatus extends PageManagerHandlerInterface {
       }))
         .filter(comment => comment.user !== user && comment.date >= lastCommitDate);
 
+      const labels = prInfo.labels.map(labelInfo => labelInfo.name);
+
       return {
         date,
         number: prInfo.number,
@@ -99,33 +101,36 @@ class GetPRStatus extends PageManagerHandlerInterface {
         comments,
         reviews,
         issueComments,
+        labels,
       };
     });
   }
 
-  _getPRBlockStatus(prList) {
-    return prList.map((pr, idx) => {
-      const { user, number } = pr;
-      const isBlocked = prList.slice(idx + 1)
-        .filter(filterPr => filterPr.user !== user)
-        .map((filterPr) => {
-          const { comments, reviews, issueComments } = filterPr;
-          const hasComments = comments.some(comment => comment.user === user);
-          const hasReviews = reviews.some(review => review.user === user);
-          const hasIssueComments = issueComments.some(comment => comment.user === user);
-          return {
-            number: filterPr.number,
-            blocks: (!hasComments && !hasReviews && !hasIssueComments),
-          };
-        })
-        .some(filterPr => filterPr.blocks);
+  _getPRBlockStatus(blockPrConfig, prList) {
+    const { skipLabels = [] } = blockPrConfig;
+    return prList.filter(filterPr => !filterPr.labels.some(label => skipLabels.includes(label)))
+      .map((pr, idx) => {
+        const { user, number } = pr;
+        const isBlocked = prList.slice(idx + 1)
+          .filter(filterPr => filterPr.user !== user)
+          .map((filterPr) => {
+            const { comments, reviews, issueComments } = filterPr;
+            const hasComments = comments.some(comment => comment.user === user);
+            const hasReviews = reviews.some(review => review.user === user);
+            const hasIssueComments = issueComments.some(comment => comment.user === user);
+            return {
+              number: filterPr.number,
+              blocks: (!hasComments && !hasReviews && !hasIssueComments),
+            };
+          })
+          .some(filterPr => filterPr.blocks);
 
-      return {
-        user,
-        number,
-        isBlocked,
-      };
-    });
+        return {
+          user,
+          number,
+          isBlocked,
+        };
+      });
   }
 
   /**
@@ -140,17 +145,19 @@ class GetPRStatus extends PageManagerHandlerInterface {
    * @override
    */
   onPageUpdate(send, tab, urlMeta, config) {
-    if (!config.blockPRs) {
+    const { blockPRs = {} } = config;
+    if (!blockPRs.block) {
       return;
     }
     const url = new URL(tab.url);
     if (url.search && !url.search.includes('open')) {
       return;
     }
+    const getPRBlockStatus = this._getPRBlockStatus.bind(null, blockPRs);
     const { owner, repo } = getGithubUrlMeta(url.pathname);
     this._getOpenPRsInfo(owner, repo)
       .then(this._processPRInfo)
-      .then(this._getPRBlockStatus)
+      .then(getPRBlockStatus)
       .then((prStatus) => {
         const message = {
           [urlMeta.page]: {

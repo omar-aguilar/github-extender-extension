@@ -4,7 +4,10 @@ const repoConfig = () => {
   const RepoConfig = Joi.object().keys({
     repo: Joi.string().required(),
     titleRegEx: Joi.string(),
-    blockPRs: Joi.boolean(),
+    blockPRs: Joi.object().keys({
+      block: Joi.boolean(),
+      skipLabels: Joi.array().items(Joi.string()),
+    }),
   });
   return Joi.array().items(RepoConfig).min(1);
 };
