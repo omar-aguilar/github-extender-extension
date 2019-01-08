@@ -81,13 +81,13 @@ class GetPRStatus extends PageManagerHandlerInterface {
 
       const reviews = prReviews.map(review => ({
         user: review.user.login,
-        date: review.updated_at,
+        date: review.submitted_at,
       }))
         .filter(review => review.user !== user && review.date >= lastCommitDate);
 
       const issueComments = prIssueComments.map(comment => ({
         user: comment.user.login,
-        date: comment.updated_at,
+        date: comment.created_at,
       }))
         .filter(comment => comment.user !== user && comment.date >= lastCommitDate);
 
