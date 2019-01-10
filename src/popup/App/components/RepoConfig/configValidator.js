@@ -7,6 +7,7 @@ const repoConfig = () => {
     blockPRs: Joi.object().keys({
       block: Joi.boolean(),
       skipLabels: Joi.array().items(Joi.string()),
+      useUserLevelBlock: Joi.boolean(),
     }),
   });
   return Joi.array().items(RepoConfig).min(1);

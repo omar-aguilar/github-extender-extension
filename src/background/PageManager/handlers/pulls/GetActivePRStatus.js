@@ -106,31 +106,87 @@ class GetPRStatus extends PageManagerHandlerInterface {
     });
   }
 
-  _getPRBlockStatus(blockPrConfig, prList) {
-    const { skipLabels = [] } = blockPrConfig;
-    return prList.filter(filterPr => !filterPr.labels.some(label => skipLabels.includes(label)))
-      .map((pr, idx) => {
-        const { user, number } = pr;
-        const isBlocked = prList.slice(idx + 1)
-          .filter(filterPr => filterPr.user !== user)
-          .map((filterPr) => {
-            const { comments, reviews, issueComments } = filterPr;
-            const hasComments = comments.some(comment => comment.user === user);
-            const hasReviews = reviews.some(review => review.user === user);
-            const hasIssueComments = issueComments.some(comment => comment.user === user);
-            return {
-              number: filterPr.number,
-              blocks: (!hasComments && !hasReviews && !hasIssueComments),
-            };
-          })
-          .some(filterPr => filterPr.blocks);
+  _getPRTeamBlockStatus(skipLabels, prMeta) {
+    return prMeta.map((pr, idx) => {
+      const { user, number } = pr;
+      const hasSkipLabel = pr.labels.some(label => skipLabels.includes(label));
+      const isBlocked = hasSkipLabel
+        ? false
+        : ( // the user in the pr needs to review older PRs before unblock others
+          prMeta.slice(idx + 1)
+            .filter(filterPr => filterPr.user !== user)
+            .map((filterPr) => {
+              const { comments, reviews, issueComments } = filterPr;
+              const hasComments = comments.some(comment => comment.user === user);
+              const hasReviews = reviews.some(review => review.user === user);
+              const hasIssueComments = issueComments.some(comment => comment.user === user);
+              return (!hasComments && !hasReviews && !hasIssueComments);
+            })
+            .some(blocked => blocked)
+        );
+      return {
+        user,
+        number,
+        isBlocked,
+      };
+    });
+  }
 
-        return {
-          user,
-          number,
-          isBlocked,
+  _getPRUserBlockStatus(skipLabels, prMeta) {
+    const perPRReview = {};
+    prMeta.forEach((pr) => {
+      const {
+        number,
+        comments,
+        reviews,
+        issueComments,
+      } = pr;
+      if (!perPRReview[number]) {
+        perPRReview[number] = {
+          owner: pr.user,
+          reviewers: new Set(),
         };
+        const { reviewers } = perPRReview[number];
+        comments.forEach(({ user }) => reviewers.add(user));
+        issueComments.forEach(({ user }) => reviewers.add(user));
+        reviews.forEach(({ user }) => reviewers.add(user));
+      }
+    });
+
+    const shouldReview = {};
+    const userLevelBlock = [];
+    for (let idx = prMeta.length - 1; idx >= 0; idx -= 1) {
+      const pr = prMeta[idx];
+      const hasSkipLabel = pr.labels.some(label => skipLabels.includes(label));
+      const isBlocked = hasSkipLabel
+        ? false
+        : (
+          prMeta.slice(idx + 1)
+            .filter(filterPr => filterPr.user !== pr.user)
+            .map((prData) => {
+              const { reviewers } = perPRReview[prData.number];
+              if ([591].includes(prData.number)) {
+                reviewers.add('EduardoSH18');
+              }
+              if ([698].includes(prData.number)) {
+                reviewers.add('omar-aguilar');
+              }
+              if (shouldReview[prData.number] === false) {
+                return true; // if doesn't need review assume is reviewed
+              }
+              return Boolean(shouldReview[prData.number]) && reviewers.has(pr.user);
+            })
+            .some(reviewed => !reviewed)
+        );
+
+      shouldReview[pr.number] = !isBlocked;
+      userLevelBlock.push({
+        user: pr.user,
+        number: pr.number,
+        isBlocked,
       });
+    }
+    return userLevelBlock;
   }
 
   /**
@@ -153,11 +209,17 @@ class GetPRStatus extends PageManagerHandlerInterface {
     if (url.search && !url.search.includes('open')) {
       return;
     }
-    const getPRBlockStatus = this._getPRBlockStatus.bind(null, blockPRs);
+
     const { owner, repo } = getGithubUrlMeta(url.pathname);
     this._getOpenPRsInfo(owner, repo)
       .then(this._processPRInfo)
-      .then(getPRBlockStatus)
+      .then((prMeta) => {
+        const { skipLabels = [] } = blockPRs;
+        if (blockPRs.useUserLevelBlock) {
+          return this._getPRUserBlockStatus(skipLabels, prMeta);
+        }
+        return this._getPRTeamBlockStatus(skipLabels, prMeta);
+      })
       .then((prStatus) => {
         const message = {
           [urlMeta.page]: {
