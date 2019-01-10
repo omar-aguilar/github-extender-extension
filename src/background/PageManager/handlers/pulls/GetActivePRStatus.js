@@ -154,9 +154,7 @@ class GetPRStatus extends PageManagerHandlerInterface {
     });
 
     const shouldReview = {};
-    const userLevelBlock = [];
-    for (let idx = prMeta.length - 1; idx >= 0; idx -= 1) {
-      const pr = prMeta[idx];
+    return prMeta.reduceRight((result, pr, idx) => {
       const hasSkipLabel = pr.labels.some(label => skipLabels.includes(label));
       const isBlocked = hasSkipLabel
         ? false
@@ -165,12 +163,6 @@ class GetPRStatus extends PageManagerHandlerInterface {
             .filter(filterPr => filterPr.user !== pr.user)
             .map((prData) => {
               const { reviewers } = perPRReview[prData.number];
-              if ([591].includes(prData.number)) {
-                reviewers.add('EduardoSH18');
-              }
-              if ([698].includes(prData.number)) {
-                reviewers.add('omar-aguilar');
-              }
               if (shouldReview[prData.number] === false) {
                 return true; // if doesn't need review assume is reviewed
               }
@@ -180,13 +172,13 @@ class GetPRStatus extends PageManagerHandlerInterface {
         );
 
       shouldReview[pr.number] = !isBlocked;
-      userLevelBlock.push({
+      const blockData = {
         user: pr.user,
         number: pr.number,
         isBlocked,
-      });
-    }
-    return userLevelBlock;
+      };
+      return [...result, blockData];
+    }, []);
   }
 
   /**
