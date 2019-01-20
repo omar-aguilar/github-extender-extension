@@ -21,24 +21,33 @@ class App extends React.Component {
       config: {
         repoConfig: [],
         globalConfig: {},
+        reportConfig: {},
       },
+      report: '',
     };
     this.onUpdateGlobalConfig = this.onUpdateGlobalConfig.bind(this);
     this.onUpdateRepoConfig = this.onUpdateRepoConfig.bind(this);
+    this.onUpdateReportConfig = this.onUpdateReportConfig.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onTabChange = this.onTabChange.bind(this);
     this.onAddNewRepoConfig = this.onAddNewRepoConfig.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
+    this.getBlockReport = this.getBlockReport.bind(this);
   }
 
   componentDidMount() {
     const { getKey } = this.props;
+    const { config: initState } = this.state;
     getKey('config')
       .then(({ config }) => {
         if (config) {
+          const newStateConfig = {
+            ...initState,
+            ...config,
+          };
           const repoConfigItems = Array(config.repoConfig.length).fill(true);
           const configHash = md5(JSON.stringify(config));
-          this.setState({ configHash, config, repoConfigItems });
+          this.setState({ configHash, config: newStateConfig, repoConfigItems });
         }
       });
   }
@@ -49,11 +58,13 @@ class App extends React.Component {
       configHash,
       selectedTabIdx,
       config,
+      report,
     } = this.state;
     return repoConfigItems !== nextState.repoConfigItems
       || configHash !== nextState.configHash
       || selectedTabIdx !== nextState.selectedTabIdx
-      || config.globalConfig !== nextState.config.globalConfig;
+      || config !== nextState.config
+      || report !== nextState.report;
   }
 
   onTabChange(event, value) {
@@ -101,6 +112,37 @@ class App extends React.Component {
     this.setState({ config: newStore });
   }
 
+  onUpdateReportConfig(partialState) {
+    const { config } = this.state;
+    const newStore = {
+      ...config,
+      reportConfig: {
+        ...config.reportConfig,
+        ...partialState,
+      },
+    };
+    this.setState({ config: newStore });
+  }
+
+  getBlockReport() {
+    const { config: { reportConfig } } = this.state;
+    const { repo, owner } = reportConfig;
+    if (repo && owner) {
+      const message = {
+        report: {
+          blockReport: {
+            owner,
+            repo,
+          },
+        },
+      };
+      chrome.runtime.sendMessage(message, (response) => {
+        console.log('got from background', response);
+        this.setState({ report: `${response}` });
+      });
+    }
+  }
+
   saveChanges() {
     const { setKey } = this.props;
     const { config, repoConfigItems } = this.state;
@@ -120,6 +162,9 @@ class App extends React.Component {
         ...config.globalConfig,
       },
       repoConfig: newRepoConfig,
+      reportConfig: {
+        ...config.reportConfig,
+      },
     };
     setKey('config', newConfig);
   }
@@ -129,18 +174,54 @@ class App extends React.Component {
       selectedTabIdx,
       repoConfigItems,
       config,
+      report,
     } = this.state;
     return (
       <div className={styles.container}>
         <div className={styles.menu}>
           <AppBar position="static">
             <Tabs value={selectedTabIdx} onChange={this.onTabChange} fullWidth>
+              <Tab label="Report" />
               <Tab label="Repo Config" />
               <Tab label="Global Config" />
             </Tabs>
           </AppBar>
         </div>
         {selectedTabIdx === 0 && (
+          <div className={styles.tabContent}>
+            <div className={styles.reportFields}>
+              <TextField
+                type="text"
+                label="Owner"
+                value={config.reportConfig.owner || ''}
+                onChange={(event) => {
+                  this.onUpdateReportConfig({ owner: event.target.value });
+                }}
+              />
+              <TextField
+                type="text"
+                label="Repo"
+                value={config.reportConfig.repo || ''}
+                onChange={(event) => {
+                  this.onUpdateReportConfig({ repo: event.target.value });
+                }}
+              />
+              <TextField
+                type="text"
+                label="Current User"
+                value={config.reportConfig.user || ''}
+                onChange={(event) => {
+                  this.onUpdateReportConfig({ user: event.target.value });
+                }}
+              />
+            </div>
+            <div className={styles.reportView}>
+              <div className={styles.reportTitle}>Block Report</div>
+              <div>{report}</div>
+            </div>
+          </div>
+        )}
+        {selectedTabIdx === 1 && (
           <div className={styles.tabContent}>
             {repoConfigItems.map((value, idx) => {
               const onDelete = () => this.onDelete(idx);
@@ -156,13 +237,13 @@ class App extends React.Component {
             })}
           </div>
         )}
-        {selectedTabIdx === 1 && (
+        {selectedTabIdx === 2 && (
           <div className={styles.tabContent}>
             <TextField
               type="text"
               label="Github Token"
               fullWidth
-              value={config.globalConfig.githubToken}
+              value={config.globalConfig.githubToken || ''}
               onChange={(event) => {
                 this.onUpdateGlobalConfig({ githubToken: event.target.value });
               }}
@@ -171,9 +252,12 @@ class App extends React.Component {
         )}
         <div className={styles.footer}>
           { selectedTabIdx === 0 && (
+            <Button variant="contained" color="primary" size="small" onClick={this.getBlockReport}>Get Report</Button>
+          )}
+          { selectedTabIdx === 1 && (
             <Button variant="contained" color="primary" size="small" onClick={this.onAddNewRepoConfig}>
               Add One
-              <AddIcon />
+              <AddIcon className={styles.icon} />
             </Button>
           )}
           <Button variant="contained" color="primary" size="small" onClick={this.saveChanges}>Save Changes</Button>

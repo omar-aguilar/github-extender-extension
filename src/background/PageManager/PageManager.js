@@ -1,5 +1,5 @@
 import { MessageManagerHandlerInterface } from 'shared/MessageManager';
-import { getGithubUrlMeta } from './utils';
+import { getGithubUrlMeta, getConfigFor } from './utils';
 
 class PageManager extends MessageManagerHandlerInterface {
   constructor(config, send) {
@@ -8,18 +8,6 @@ class PageManager extends MessageManagerHandlerInterface {
     this.messageTopics = {};
     this.config = config.repoConfig || [];
     this.send = send;
-  }
-
-  _getConfigFor(owner, repo) {
-    const ownerConfig = this.config.find(({ owner: repoOwner }) => repoOwner === owner) || {};
-    const textConfig = ownerConfig.config;
-    try {
-      const parsedConfig = JSON.parse(textConfig);
-      const config = parsedConfig.find(repoConfig => repoConfig.repo === repo);
-      return config || {};
-    } catch (error) {
-      return {};
-    }
   }
 
   subscribe(type = 'page', topic, handler) {
@@ -46,7 +34,7 @@ class PageManager extends MessageManagerHandlerInterface {
       return;
     }
     const urlMeta = getGithubUrlMeta(url.pathname);
-    const config = this._getConfigFor(urlMeta.owner, urlMeta.repo);
+    const config = getConfigFor(this.config, urlMeta.owner, urlMeta.repo);
     const topic = this.messageTopics[urlMeta.page];
     if (topic) {
       const send = this.send.bind(null, tab);
@@ -60,7 +48,7 @@ class PageManager extends MessageManagerHandlerInterface {
       return;
     }
     const urlMeta = getGithubUrlMeta(url.pathname);
-    const config = this._getConfigFor(urlMeta.owner, urlMeta.repo);
+    const config = getConfigFor(this.config, urlMeta.owner, urlMeta.repo);
     const topicName = urlMeta.page;
     const topic = this.pageUpdateTopics[topicName];
     if (topic) {

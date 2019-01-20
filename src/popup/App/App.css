@@ -7,6 +7,25 @@
   width: 600px;
 }
 
+.icon {
+  font-size: 18px !important;
+  margin-left: 4px;
+}
+
+.reportFields > div:not(:first-child) {
+  margin-left: 8px;
+}
+
+.reportView {
+  margin-top: 8px;
+  border: 1px dashed gray;
+}
+
+.reportTitle {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .container {
   padding: 8px;
 }

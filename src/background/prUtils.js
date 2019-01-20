@@ -120,4 +120,5 @@ export {
   extractPRSummary,
   getOpenPRsInfo,
   getReviewsPerPr,
+  getConfigFor,
 };
