@@ -44,7 +44,7 @@ class GetPRStatus extends PageManagerHandlerInterface {
     const perPRReview = getReviewsPerPr(prMeta, reviewPassedLabels);
     const shouldReview = {};
     return prMeta.reduceRight((result, pr, idx) => {
-      const { reviewers, reviewPassed } = perPRReview[pr.number];
+      const { reviewPassed } = perPRReview[pr.number];
       const hasSkipLabel = pr.labels.some(label => skipLabels.includes(label));
       const isBlocked = hasSkipLabel || reviewPassed
         ? false
@@ -52,14 +52,14 @@ class GetPRStatus extends PageManagerHandlerInterface {
           prMeta.slice(idx + 1)
             .filter(filterPr => filterPr.user !== pr.user)
             .map((prData) => {
-              if (shouldReview[prData.number] === false || reviewPassed) {
+              const { reviewers, reviewPassed: prReviewPassed } = perPRReview[prData.number];
+              if (shouldReview[prData.number] === false || prReviewPassed) {
                 return true;
               }
               return Boolean(shouldReview[prData.number]) && reviewers.has(pr.user);
             })
             .some(reviewed => !reviewed)
         );
-
       shouldReview[pr.number] = !isBlocked;
       const blockData = {
         user: pr.user,

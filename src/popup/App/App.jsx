@@ -8,6 +8,7 @@ import Tab from '@material-ui/core/Tab';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RepoConfig from './components/RepoConfig';
+import Report from './components/Report';
 
 import styles from './App.css';
 
@@ -23,7 +24,6 @@ class App extends React.Component {
         globalConfig: {},
         reportConfig: {},
       },
-      report: '',
     };
     this.onUpdateGlobalConfig = this.onUpdateGlobalConfig.bind(this);
     this.onUpdateRepoConfig = this.onUpdateRepoConfig.bind(this);
@@ -32,7 +32,6 @@ class App extends React.Component {
     this.onTabChange = this.onTabChange.bind(this);
     this.onAddNewRepoConfig = this.onAddNewRepoConfig.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
-    this.getBlockReport = this.getBlockReport.bind(this);
   }
 
   componentDidMount() {
@@ -58,13 +57,13 @@ class App extends React.Component {
       configHash,
       selectedTabIdx,
       config,
-      report,
     } = this.state;
+    const { report } = this.props;
     return repoConfigItems !== nextState.repoConfigItems
       || configHash !== nextState.configHash
       || selectedTabIdx !== nextState.selectedTabIdx
       || config !== nextState.config
-      || report !== nextState.report;
+      || report !== nextProps.report;
   }
 
   onTabChange(event, value) {
@@ -124,25 +123,6 @@ class App extends React.Component {
     this.setState({ config: newStore });
   }
 
-  getBlockReport() {
-    const { config: { reportConfig } } = this.state;
-    const { repo, owner } = reportConfig;
-    if (repo && owner) {
-      const message = {
-        report: {
-          blockReport: {
-            owner,
-            repo,
-          },
-        },
-      };
-      chrome.runtime.sendMessage(message, (response) => {
-        console.log('got from background', response);
-        this.setState({ report: `${response}` });
-      });
-    }
-  }
-
   saveChanges() {
     const { setKey } = this.props;
     const { config, repoConfigItems } = this.state;
@@ -170,12 +150,8 @@ class App extends React.Component {
   }
 
   render() {
-    const {
-      selectedTabIdx,
-      repoConfigItems,
-      config,
-      report,
-    } = this.state;
+    const { report } = this.props;
+    const { selectedTabIdx, repoConfigItems, config } = this.state;
     return (
       <div className={styles.container}>
         <div className={styles.menu}>
@@ -189,36 +165,46 @@ class App extends React.Component {
         </div>
         {selectedTabIdx === 0 && (
           <div className={styles.tabContent}>
-            <div className={styles.reportFields}>
-              <TextField
-                type="text"
-                label="Owner"
-                value={config.reportConfig.owner || ''}
-                onChange={(event) => {
-                  this.onUpdateReportConfig({ owner: event.target.value });
-                }}
-              />
-              <TextField
-                type="text"
-                label="Repo"
-                value={config.reportConfig.repo || ''}
-                onChange={(event) => {
-                  this.onUpdateReportConfig({ repo: event.target.value });
-                }}
-              />
-              <TextField
-                type="text"
-                label="Current User"
-                value={config.reportConfig.user || ''}
-                onChange={(event) => {
-                  this.onUpdateReportConfig({ user: event.target.value });
-                }}
-              />
+            <div>
+              <div className={styles.reportFields}>
+                <TextField
+                  type="text"
+                  label="Owner"
+                  value={config.reportConfig.owner || ''}
+                  onChange={(event) => {
+                    this.onUpdateReportConfig({ owner: event.target.value });
+                  }}
+                />
+                <TextField
+                  type="text"
+                  label="Repo"
+                  value={config.reportConfig.repo || ''}
+                  onChange={(event) => {
+                    this.onUpdateReportConfig({ repo: event.target.value });
+                  }}
+                />
+                <TextField
+                  type="text"
+                  label="Current User"
+                  value={config.reportConfig.user || ''}
+                  onChange={(event) => {
+                    this.onUpdateReportConfig({ user: event.target.value });
+                  }}
+                />
+              </div>
+              <div>
+                <TextField
+                  type="text"
+                  fullWidth
+                  label="Users in Report"
+                  value={(config.reportConfig.usersInReport || []).join(', ')}
+                  onChange={(event) => {
+                    this.onUpdateReportConfig({ usersInReport: event.target.value.split(/\s*,\s*/)});
+                  }}
+                />
+              </div>
             </div>
-            <div className={styles.reportView}>
-              <div className={styles.reportTitle}>Block Report</div>
-              <div>{report}</div>
-            </div>
+            <Report report={report} reportConfig={config.reportConfig} />
           </div>
         )}
         {selectedTabIdx === 1 && (
@@ -251,9 +237,6 @@ class App extends React.Component {
           </div>
         )}
         <div className={styles.footer}>
-          { selectedTabIdx === 0 && (
-            <Button variant="contained" color="primary" size="small" onClick={this.getBlockReport}>Get Report</Button>
-          )}
           { selectedTabIdx === 1 && (
             <Button variant="contained" color="primary" size="small" onClick={this.onAddNewRepoConfig}>
               Add One
@@ -270,6 +253,11 @@ class App extends React.Component {
 App.propTypes = {
   setKey: PropTypes.func.isRequired,
   getKey: PropTypes.func.isRequired,
+  report: PropTypes.shape({}),
+};
+
+App.defaultProps = {
+  report: {},
 };
 
 export default App;

@@ -27,22 +27,6 @@ storageManager.getKey('config').then(({ config = {} }) => {
   pageManager.subscribe('page', 'pulls', new AddNumberOfChanges());
   pageManager.subscribe('page', 'pulls', new HighlightRepoTitle());
 
-  // communication between background and popup
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    const { report } = request;
-    if (report) {
-      if (report.blockReport) {
-        const { owner, repo } = report.blockReport;
-        blockReport.get(owner, repo)
-          .then((result) => {
-            console.log('block report', result);
-            sendResponse(result);
-          });
-      }
-    }
-    return true;
-  });
-
   // listen to pageUpdates
   chrome.tabs.onCreated.addListener((tab) => {
     pageManager.onPageUpdateReceived(tab);
@@ -50,6 +34,22 @@ storageManager.getKey('config').then(({ config = {} }) => {
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === 'complete') {
       pageManager.onPageUpdateReceived(tab);
+    }
+  });
+
+  // Periodic tasks
+  const alarms = {
+    PERIODIC_REPORT: 'periodicReport',
+  };
+  // start delayInMinutes after set and run periodically every periodInMinutes
+  chrome.alarms.create('periodicReport', { delayInMinutes: 1, periodInMinutes: 30 });
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    const { reportConfig } = config;
+    const { owner, repo, usersInReport } = reportConfig;
+    if (alarm.name === alarms.PERIODIC_REPORT) {
+      console.log('updating report');
+      blockReport.get(owner, repo, usersInReport)
+        .then(report => storageManager.setKey('report', report));
     }
   });
 });
