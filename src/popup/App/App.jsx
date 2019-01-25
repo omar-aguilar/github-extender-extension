@@ -32,6 +32,7 @@ class App extends React.Component {
     this.onTabChange = this.onTabChange.bind(this);
     this.onAddNewRepoConfig = this.onAddNewRepoConfig.bind(this);
     this.saveChanges = this.saveChanges.bind(this);
+    this.updateReport = this.updateReport.bind(this);
   }
 
   componentDidMount() {
@@ -149,6 +150,23 @@ class App extends React.Component {
     setKey('config', newConfig);
   }
 
+  updateReport() {
+    const { config: { reportConfig } } = this.state;
+    const { repo, owner, usersInReport } = reportConfig;
+    if (repo && owner) {
+      const message = {
+        report: {
+          blockReport: {
+            owner,
+            repo,
+            usersInReport,
+          },
+        },
+      };
+      chrome.runtime.sendMessage(message);
+    }
+  }
+
   render() {
     const { report } = this.props;
     const { selectedTabIdx, repoConfigItems, config } = this.state;
@@ -199,7 +217,7 @@ class App extends React.Component {
                   label="Users in Report"
                   value={(config.reportConfig.usersInReport || []).join(', ')}
                   onChange={(event) => {
-                    this.onUpdateReportConfig({ usersInReport: event.target.value.split(/\s*,\s*/)});
+                    this.onUpdateReportConfig({ usersInReport: event.target.value.split(/\s*,\s*/) });
                   }}
                 />
               </div>
@@ -237,6 +255,9 @@ class App extends React.Component {
           </div>
         )}
         <div className={styles.footer}>
+          { selectedTabIdx === 0 && (
+            <Button variant="contained" color="primary" size="small" onClick={this.updateReport}>Update Report</Button>
+          )}
           { selectedTabIdx === 1 && (
             <Button variant="contained" color="primary" size="small" onClick={this.onAddNewRepoConfig}>
               Add One

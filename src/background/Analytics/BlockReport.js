@@ -96,11 +96,13 @@ class BlockReport {
         .join('\n');
     }
 
+    const shameEmojis = [':whip:', ':latigazo:'];
     if (shameList.data) {
       shameListText = `${shameList.title} :mickey-sp:\n`;
       shameListText += shameList.data.map(({ user, prLinks }) => {
+        const shameEmoji = shameEmojis[Math.floor(Math.random() * shameEmojis.length)];
         const prsText = prLinks.map(({ number, link }) => (link ? `<${link}|${number}>` : number)).join(', ');
-        return `:whip: \`${user}\` needs to review ${prsText}`;
+        return `${shameEmoji} \`${user}\` needs to review ${prsText}`;
       })
         .join('\n');
     }

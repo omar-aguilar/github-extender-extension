@@ -8,34 +8,39 @@ const _getData = (repo, owner, path, token) => {
   })
     .then(response => response.json())
     .catch((error) => {
-      console.log('error getting url', url, error);
+      console.log('error in get request, url', url, error);
       Promise.resolve(null);
     });
 };
 
 const getOpenPRsInfo = (owner, repo, token) => _getData(owner, repo, ['pulls'], token)
-  .then((prs) => {
-    const promises = prs.map((pr) => {
-      // get meta for each pr
+  .then(prs => Promise.all(
+    prs.map((pr) => {
+      // get last commit for each pr
+      const { head: { sha } } = pr;
+      return Promise.all([pr, _getData(owner, repo, ['commits', sha], token)]);
+    }),
+  ))
+  .then(prs => Promise.all(
+    prs.map(([pr, lastCommit]) => {
+      // get comments and reviews for each pr
       const { number } = pr;
       const paths = [
         ['pulls', number, 'comments'],
-        ['pulls', number, 'commits'],
         ['pulls', number, 'reviews'],
         ['issues', number, 'comments'],
       ];
       const metaPromises = paths.map(path => _getData(owner, repo, path, token));
-      return Promise.all([pr, ...metaPromises]);
-    });
-    return Promise.all(promises);
-  })
+      return Promise.all([pr, lastCommit, ...metaPromises]);
+    }),
+  ))
   .then(prsMeta => prsMeta.map((meta) => {
     // resolve meta as an object
-    const [info, comments, commits, reviews, issueComments] = meta;
+    const [info, lastCommit, comments, reviews, issueComments] = meta;
     return {
       info,
+      lastCommit,
       comments,
-      commits,
       reviews,
       issueComments,
     };
@@ -44,20 +49,14 @@ const getOpenPRsInfo = (owner, repo, token) => _getData(owner, repo, ['pulls'], 
 const extractPRSummary = prList => prList.map((pr) => {
   const {
     info: prInfo,
+    lastCommit,
     comments: prComments,
-    commits: prCommits,
     reviews: prReviews,
     issueComments: prIssueComments,
   } = pr || {};
   const user = prInfo.user.login;
   const date = prInfo.created_at;
-
-  const [lastCommit] = prCommits.slice(-1)
-    .map(commit => ({
-      user: commit.committer.login,
-      date: commit.commit.committer.date,
-    }));
-  const { date: lastCommitDate } = lastCommit;
+  const lastCommitDate = lastCommit.commit.committer.date;
 
   const comments = prComments.map(comment => ({
     user: comment.user.login,
@@ -120,5 +119,4 @@ export {
   extractPRSummary,
   getOpenPRsInfo,
   getReviewsPerPr,
-  getConfigFor,
 };
