@@ -1,6 +1,5 @@
 import MessageManager from 'shared/MessageManager';
 import StorageManager from 'shared/StorageManager';
-import { postMessageToSlack } from 'shared/utils';
 import { BlockReport } from './Analytics';
 import PageManager from './PageManager';
 
