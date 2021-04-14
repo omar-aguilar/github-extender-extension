@@ -9,9 +9,13 @@ const paths = {
   src: path.join(__dirname, 'src'),
   popup: path.join(__dirname, 'src', 'popup'),
   background: path.join(__dirname, 'src', 'background'),
+  shared: path.join(__dirname, 'src', 'shared'),
   contentScripts: path.join(__dirname, 'src', 'contentScripts'),
+  assets: path.join(__dirname, 'src', 'assets'),
   output: path.join(__dirname, 'dist'),
 };
+
+const webComponentsPolyfill = 'webcomponents-sd-ce.js';
 
 const contentScriptsEntries = {};
 const contentScriptsManifest = [];
@@ -26,39 +30,37 @@ fs.readdirSync(paths.contentScripts)
   .filter(dirPath => dirPath)
   .forEach((contentScript) => {
     const [name, dirPath] = contentScript;
-    const config = require(path.join(dirPath, 'config')); // eslint-disable-line global-require, import/no-dynamic-require
+    // eslint-disable-next-line global-require, import/no-dynamic-require
+    const config = require(path.join(dirPath, 'config'));
     const scriptName = `content_scripts/${name}`;
+    const webComponents = `content_scripts/${webComponentsPolyfill}`;
     contentScriptsEntries[scriptName] = dirPath;
     contentScriptsManifest.push({
       ...config,
-      js: [`${scriptName}.js`],
+      js: [webComponents, `${scriptName}.js`],
       css: [`${scriptName}.css`],
     });
   });
 
 module.exports = {
-  mode: process.env.NODE_ENV || 'development',
   devtool: 'source-map',
-  entry: Object.assign(
-    contentScriptsEntries,
-    {
-      popup: paths.popup,
-      background: paths.background,
-    },
-  ),
+  entry: {
+    ...contentScriptsEntries,
+    popup: paths.popup,
+    background: paths.background,
+  },
   module: {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: [/node_modules/],
-        include: [paths.popup],
+        exclude: [/node_modules/, `${paths.assets}/${webComponentsPolyfill}`],
+        include: [paths.popup, paths.shared, paths.background],
         use: {
           loader: 'babel-loader',
         },
       },
       {
         test: /\.css$/,
-        // include: [paths.contentScripts],
         use: [
           MiniCssExtractPlugin.loader,
           {
@@ -70,20 +72,21 @@ module.exports = {
           },
         ],
       },
-      // {
-      //   test: /\.css$/,
-      //   include: [paths.popup],
-      //   use: [
-      //     'style-loader',
-      //     {
-      //       loader: 'css-loader',
-      //       options: {
-      //         localIdentName: '[path]__[local]___[md5:hash:hex:5]',
-      //         modules: true,
-      //       },
-      //     },
-      //   ],
-      // },
+      {
+        test: /\.gif$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 12288,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.svg$/,
+        use: 'raw-loader',
+      },
     ],
   },
   output: {
@@ -102,21 +105,20 @@ module.exports = {
     new CopyWebpackPlugin([
       {
         from: `${paths.src}/manifest.json`,
-        transform: content => JSON.stringify(
-          Object.assign(
-            JSON.parse(content),
-            {
-              description: process.env.npm_package_description,
-              version: process.env.npm_package_version,
-              content_scripts: [
-                ...contentScriptsManifest,
-              ],
-            },
-          ),
-          null,
-          2,
-        ),
+        transform: (content) => {
+          const template = JSON.parse(content);
+          const newManifest = {
+            ...template,
+            description: process.env.npm_package_description,
+            version: process.env.npm_package_version,
+            content_scripts: [
+              ...contentScriptsManifest,
+            ],
+          };
+          return JSON.stringify(newManifest, null, 2);
+        },
       },
+      { from: `${paths.assets}/${webComponentsPolyfill}`, to: './content_scripts' },
     ]),
     new MiniCssExtractPlugin({
       filename: '[name].css',

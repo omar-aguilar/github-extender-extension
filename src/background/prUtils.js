@@ -74,7 +74,10 @@ const _getAllData = (repo, owner, path, token) => {
     .then(responses => responses.reduce((result, next) => result.concat(next)));
 };
 
-const getOpenPRsInfo = (owner, repo, token) => _getData(owner, repo, ['pulls'], token)
+const getOpenPRs = (owner, repo, token) =>
+  _getData(owner, repo, ['pulls'], token)
+
+const getOpenPRsInfo = (owner, repo, token) => getOpenPRs(owner, repo, token)
   .then(prs => Promise.all(
     prs.map((pr) => {
       // get last commit for each pr
@@ -180,4 +183,5 @@ export {
   extractPRSummary,
   getOpenPRsInfo,
   getReviewsPerPr,
+  getOpenPRs,
 };

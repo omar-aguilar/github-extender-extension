@@ -1,0 +1,20 @@
+.expired-svg-container {
+  margin-left: 4px;
+  margin-right: 0;
+}
+.expired-svg-container > svg {
+  width: 100%;
+  height: 100%;
+}
+.expired-svg-container.green > svg path:not([fill]) {
+  fill: #66bb6a;
+}
+.expired-svg-container.green > svg > g {
+  fill: #66bb6a;
+}
+.expired-svg-container.yellow > svg > g {
+  fill: #ffca28;
+}
+.expired-svg-container.red > svg > g {
+  fill: #ef5350;
+}

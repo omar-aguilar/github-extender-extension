@@ -1,10 +1,8 @@
 import { extractPRSummary, getOpenPRsInfo, getReviewsPerPr } from 'background/prUtils';
-import PageManagerHandlerInterface from '../../PageManagerHandlerInterface';
 import { getGithubUrlMeta } from '../../utils';
 
-class GetPRStatus extends PageManagerHandlerInterface {
+class GetPRStatus {
   constructor(config) {
-    super();
     const globalConfig = config.globalConfig || {};
     this.token = globalConfig.githubToken;
   }

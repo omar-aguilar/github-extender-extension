@@ -1,8 +1,8 @@
-.markPrTitle {
+.relative {
   position: relative
 }
 
-.mark {
+/* .mark {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -17,4 +17,4 @@
   border: 1px dashed coral;
   color: coral;
   border-radius: 4px;
-}
+} */

@@ -1,0 +1,25 @@
+@import "./normalize.css";
+
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); 
+
+html {
+  height: 600px;
+  width: 800px;
+}
+
+body {
+  height: 100%;
+  font-family: 'Roboto Mono', monospace;
+}
+
+:global(#app),
+:global(#app) > div:first-child {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+* {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

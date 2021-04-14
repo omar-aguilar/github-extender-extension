@@ -1,11 +1,18 @@
 import React from 'react';
 import { render } from 'react-dom';
-import withStorageManager from './StorageManagerProvider';
-import App from './App';
+import { Provider } from 'react-redux';
 
-// TODO include message to background when Save Changes is clicked
-const AppWithStorage = withStorageManager(App);
+import './assets/css/index.css';
+
+import { store } from './store';
+import App from './App';
+import withExtensionStorage from './App/components/HOC/withExtensionStorage';
+
+const AppWithStorage = withExtensionStorage(App);
+
 render(
-  <AppWithStorage />,
+  <Provider store={store}>
+    <AppWithStorage />
+  </Provider>,
   document.getElementById('app'),
 );

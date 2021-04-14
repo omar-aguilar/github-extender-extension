@@ -1,0 +1,17 @@
+.repoConfig {
+  border: 1px dashed grey;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.repoOwner {
+  width: 400px;
+}
+
+.iconDelete {
+  position: absolute !important;
+  top: 8px;
+  right: 8px;
+}

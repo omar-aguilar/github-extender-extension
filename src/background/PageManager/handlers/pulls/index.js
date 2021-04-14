@@ -1,10 +1,7 @@
-
-import AddNumberOfChanges from './AddNumberOfChanges';
 import GetActivePRStatus from './GetActivePRStatus';
-import HighlightRepoTitle from './HighlightRepoTitle';
+
 
 export {
-  AddNumberOfChanges,
+  // eslint-disable-next-line import/prefer-default-export
   GetActivePRStatus,
-  HighlightRepoTitle,
 };

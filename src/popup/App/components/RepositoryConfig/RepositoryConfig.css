@@ -1,0 +1,16 @@
+.configContainer {
+  height: 544px;
+}
+
+.content {
+  height: 496px;
+  overflow: auto;
+}
+
+.footer {
+  z-index: 5;
+}
+
+.footer > .button:not(:last-child) {
+  margin-right: 8px;
+}

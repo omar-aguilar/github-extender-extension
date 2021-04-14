@@ -1,0 +1,8 @@
+.svg-container > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.svg-container > svg > path {
+  fill: #ffca28;
+}

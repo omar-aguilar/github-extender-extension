@@ -1,8 +1,9 @@
 {
-  "extends": "airbnb",
+  "extends": ["airbnb"],
   "parser": "babel-eslint",
   "env": {
-    "browser": true
+    "browser": true,
+    "webextensions": true
   },
   "plugins": [
     "react"
@@ -12,11 +13,18 @@
       "error",
       { "devDependencies": true }
     ],
+    "no-bitwise": 0,
     "no-underscore-dangle": 0,
     "class-methods-use-this": 0,
-    "import/no-unresolved": 0
+    "react/destructuring-assignment": [
+      "error",
+      "always",
+      { "ignoreClassFields": true }
+    ]
   },
-  "globals": {
-    "chrome": true
+  "import/resolver": {
+    "node": {
+        "paths": ["./src"]
+    }
   }
 }
