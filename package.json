@@ -4,8 +4,8 @@
   "description": "Add functionality to Github via Chrome extension",
   "scripts": {
     "build": "npm run build-dev",
-    "build-dev": "webpack --mode development",
-    "build-prod": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "build:prod": "webpack --mode production",
     "lint": "eslint --color --ext .js,.ts,.tsx src *.js"
   },
   "keywords": [
@@ -16,5 +16,13 @@
   ],
   "author": "Omar Aguilar",
   "repository": "github:omar-aguilar/github-extender-extension",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.13.15",
+    "@babel/preset-env": "^7.13.15",
+    "babel-loader": "^8.2.2",
+    "typescript": "^4.2.4",
+    "webpack": "^5.32.0",
+    "webpack-cli": "^4.6.0"
+  }
 }
