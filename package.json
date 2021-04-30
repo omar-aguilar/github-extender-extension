@@ -3,10 +3,11 @@
   "version": "2.0.0",
   "description": "Add functionality to Github via Chrome extension",
   "scripts": {
-    "build": "npm run build-dev",
+    "build": "npm run build:dev",
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
-    "lint": "eslint --color --ext .js,.ts,.tsx src *.js"
+    "watch": "webpack --mode development --watch",
+    "lint": "eslint --color --ext .js,.ts,.tsx src *.js .eslintrc.js"
   },
   "keywords": [
     "github",
@@ -17,12 +18,35 @@
   "author": "Omar Aguilar",
   "repository": "github:omar-aguilar/github-extender-extension",
   "license": "MIT",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
   "devDependencies": {
-    "@babel/core": "^7.13.15",
-    "@babel/preset-env": "^7.13.15",
+    "@babel/core": "^7.14.0",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-env": "^7.14.0",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
     "babel-loader": "^8.2.2",
+    "copy-webpack-plugin": "^8.1.1",
+    "core-js": "^3.11.1",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "html-webpack-plugin": "^5.3.1",
+    "prettier": "^2.2.1",
     "typescript": "^4.2.4",
-    "webpack": "^5.32.0",
+    "webpack": "^5.36.2",
     "webpack-cli": "^4.6.0"
   }
 }
