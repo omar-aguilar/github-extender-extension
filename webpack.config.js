@@ -7,12 +7,14 @@ const paths = {
   dist: path.join(__dirname, 'dist'),
   popup: path.join(__dirname, 'src', 'popup'),
   background: path.join(__dirname, 'src', 'background'),
+  contentScripts: path.join(__dirname, 'src', 'contentScripts'),
 };
 
 module.exports = {
   entry: {
     background: paths.background,
     popup: paths.popup,
+    contentScripts: paths.contentScripts,
   },
   output: {
     path: paths.dist,

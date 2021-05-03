@@ -3,7 +3,10 @@
   "name": "Github Extender Extension",
   "version": "AUTO-GENERATED",
   "description": "AUTO-GENERATED",
-  "content_scripts": [],
+  "content_scripts": [{
+    "matches": ["https://github.com/*/pulls*"],
+    "js": ["contentScripts.js"]
+  }],
   "action": {
     "default_popup": "popup.html"
   },

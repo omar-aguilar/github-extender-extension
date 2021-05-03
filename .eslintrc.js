@@ -35,6 +35,7 @@ module.exports = {
     'react/self-closing-comp': 'error',
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
+    'consistent-return': 'off',
   },
   settings: {
     react: {
