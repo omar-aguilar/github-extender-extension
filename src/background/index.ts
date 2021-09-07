@@ -1,60 +1,13 @@
-import ActivePRStatus from '../plugins/ActivePRStatus';
+import HighlightPRTitle from '../plugins/HighlightPRTitle';
+import ChromeTabs from '../utils/browser/ChromeTabs';
+import GithubPageManager from './GithubPageManager';
 import PluginManager from './PluginManager';
-import { SendMessageFn } from '../types';
 
 const { tabs } = chrome;
+const chromeTabs = ChromeTabs(tabs);
+const githubPageManager = GithubPageManager(chromeTabs);
 
-const plugins = [ActivePRStatus()];
-const pluginManager = PluginManager(plugins);
+const plugins: BGPluginManager.Plugins = [HighlightPRTitle()];
+PluginManager(githubPageManager, plugins);
 
-function send<T>(tab: chrome.tabs.Tab): SendMessageFn<T> {
-  return (data: T): void => {
-    if (!tab.id) {
-      console.error('invalid tab send');
-      return;
-    }
-    tabs.sendMessage(tab.id, data);
-  };
-}
-
-function handlePage(tab: chrome.tabs.Tab): void {
-  if (!tab.url?.endsWith('pulls')) {
-    return;
-  }
-
-  const background = pluginManager.backgrounds[0];
-  const { contentScript } = pluginManager.contentScripts[0];
-  background();
-
-  const sendFn = send<any>(tab);
-  contentScript?.(sendFn);
-}
-
-function getURL(stringUrl?: string): URL | void {
-  if (!stringUrl) {
-    return;
-  }
-
-  try {
-    const url = new URL(stringUrl);
-    return url;
-  } catch (error) {
-    console.error(`${stringUrl} cannot cannot be parsed, ignoring`, error);
-  }
-}
-function onPageUpdateReceived(tab: chrome.tabs.Tab) {
-  const url = getURL(tab.url);
-  if (!url || url.hostname !== 'github.com') {
-    return;
-  }
-  handlePage(tab);
-}
-
-tabs.onCreated.addListener(onPageUpdateReceived);
-
-tabs.onUpdated.addListener((_, changeInfo, tab) => {
-  if (changeInfo.status !== 'complete') {
-    return;
-  }
-  onPageUpdateReceived(tab);
-});
+console.log('background loaded');
