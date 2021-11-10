@@ -73,11 +73,26 @@ declare namespace GithubPageManager {
     search?: URLSearchParams;
   };
 
-  export type PageArguments = [GithubPage, BrowserExtensions.SendMessageFn, URL];
+  export type SectionHandlers = 'pulls' | 'pull' | 'noHandler';
+  export type SectionHandler = (
+    githubPage: GithubPage,
+    sendMessage: BGPluginManager.SendPluginMessageFn
+  ) => void;
+  export type SectionHandlerMap = Record<SectionHandlers, SectionHandler>;
+
+  export type PageArguments = [GithubPage, BGPluginManager.SendPluginMessageFn, URL];
   export type Page = EventHook.Hook<PageArguments>;
+
+  export type PullsArguments = [GithubPage, BGPluginManager.SendPluginMessageFn];
+  export type Pulls = EventHook.Hook<PullsArguments>;
+
+  export type PullArguments = [string, GithubPage, BGPluginManager.SendPluginMessageFn];
+  export type Pull = EventHook.Hook<PullArguments>;
 
   export type Hooks = {
     page: Page;
+    pulls: Pulls;
+    pull: Pull;
   };
 }
 
@@ -86,16 +101,25 @@ interface GithubPageManager {
 }
 
 declare namespace BGPluginManager {
-  export type SendPluginMessageFn = <T>(source: string, data: T) => void;
-  export type PageArguments = [GithubPageManager.GithubPage, SendPluginMessageFn];
+  export type SendPluginMessageFn = <T>(source: string, event: string, data: T) => void;
+  export type PageArguments = [ChromeTabs.ValidTab, SendPluginMessageFn];
   export type Page = EventHook.Hook<PageArguments>;
 
   export type Hooks = {
     page: Page;
   };
 
+  export type ManagerHooks = {
+    github: GithubPageManager.Hooks;
+  };
+
+  export type RegisterHooks = {
+    plugin: Hooks;
+    manager: ManagerHooks;
+  };
+
   export type Plugin = {
-    register: (hooks: Hooks) => void;
+    register: (hooks: RegisterHooks) => void;
   };
 
   export type Plugins = Plugin[];
@@ -107,15 +131,23 @@ interface BGPluginManager {
 
 declare namespace CSPluginManager {
   export type SendPluginMessageFn = <T>(source: string, data: T) => void;
-  export type MessageArguments = [string, any];
+  export type MessageArguments = [string, string, any];
   export type Message = EventHook.Hook<MessageArguments>;
 
+  export type PluginHookCallerInfo = {
+    source: string;
+    event: string;
+  };
+  export type PluginHookArguments = [any, PluginHookCallerInfo];
+  export type PluginHooks = Record<string, EventHook.Hook<PluginHookArguments>>;
+  export type RegisteredHooks = Record<string, PluginHooks>;
+  export type RegisterHooksFn = (pluginName: string, pluginHooks: any) => void;
   export type Hooks = {
     message: Message;
   };
 
   export type Plugin = {
-    register: (hooks: Hooks) => void;
+    register: (hooks: Hooks, registerHooks: RegisterHooksFn) => void;
   };
 
   export type Plugins = Plugin[];
@@ -123,4 +155,14 @@ declare namespace CSPluginManager {
 
 interface CSPluginManager {
   hooks: CSPluginManager.Hooks;
+}
+
+declare module '*.svg' {
+  const value: any;
+  export = value;
+}
+
+declare module '*.scss' {
+  const content: { [className: string]: string };
+  export = content;
 }

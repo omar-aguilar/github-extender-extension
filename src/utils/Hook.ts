@@ -1,4 +1,5 @@
-function Hook<T>(args?: EventHook.Arguments<T>): EventHook.Hook<T> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function Hook<T>(_args?: EventHook.Arguments<T>): EventHook.Hook<T> {
   const subscriptions: EventHook.Subscriptions<T> = [];
 
   function isAlreadySubscribed(handler: EventHook.HandlerFn<T>): boolean {

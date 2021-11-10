@@ -1,5 +1,8 @@
+import hooks from './hooks';
+import { PLUGIN_NAME } from './constants';
+
 function HighlightPRTitle(): CSPluginManager.Plugin {
-  const name = 'HighlightPRTitle';
+  const name = PLUGIN_NAME;
 
   function highlight(elem: HTMLElement, data: any): void {
     const { styles } = data;
@@ -17,19 +20,16 @@ function HighlightPRTitle(): CSPluginManager.Plugin {
     });
   }
 
-  function handleMessage(source: string, data: any): void {
-    if (source !== name) {
-      return;
-    }
-
+  function handleConfig(data: any): void {
     const selector = '.Box-row.js-issue-row';
     document.querySelectorAll<HTMLElement>(selector).forEach((elem) => {
       highlight(elem, data);
     });
   }
 
-  function register(hooks: CSPluginManager.Hooks) {
-    hooks.message.tap(name, handleMessage);
+  function register(_: CSPluginManager.Hooks, registerHooks: CSPluginManager.RegisterHooksFn) {
+    registerHooks(name, hooks);
+    hooks.config.tap(name, handleConfig);
   }
 
   return {

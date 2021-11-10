@@ -1,12 +1,10 @@
+import GithubPageManager from './GithubPageManager';
 import Hook from '../utils/Hook';
 
-function PluginManager(
-  githubPageManager: GithubPageManager,
-  plugins: BGPluginManager.Plugins
-): BGPluginManager {
+function PluginManager(tabs: ChromeTabs, plugins: BGPluginManager.Plugins): BGPluginManager {
   const name = 'Background.PluginManager';
   const hooks = {
-    page: Hook<BGPluginManager.PageArguments>(['page', 'sendMessage']),
+    page: Hook<BGPluginManager.PageArguments>(['tab', 'sendMessage']),
     /**
      * Add hooks for lifecycle
      * onInit: () => void; hooks.init ???
@@ -16,26 +14,29 @@ function PluginManager(
      */
   };
 
-  function handlePage(
-    githubPage: GithubPageManager.GithubPage,
-    sendMessage: BrowserExtensions.SendMessageFn
-  ): void {
-    const sendPluginMessage = <T>(source: string, data: T): void => {
-      sendMessage({ source, data });
+  function handleTab(tab: ChromeTabs.ValidTab, sendMessage: BrowserExtensions.SendMessageFn): void {
+    const sendPluginMessage: BGPluginManager.SendPluginMessageFn = (source, event, data) => {
+      sendMessage({ source, event, data });
     };
-
-    hooks.page.call(githubPage, sendPluginMessage);
+    hooks.page.call(tab, sendPluginMessage);
   }
 
-  function registerPlugins() {
+  function registerPlugins(registerHooks: BGPluginManager.RegisterHooks) {
     plugins.forEach((plugin) => {
-      plugin.register(hooks);
+      plugin.register(registerHooks);
     });
   }
 
   function init(): void {
-    registerPlugins();
-    githubPageManager.hooks.page.tap(name, handlePage);
+    const githubPageManager = GithubPageManager(hooks);
+    const registerHooks: BGPluginManager.RegisterHooks = {
+      plugin: hooks,
+      manager: {
+        github: githubPageManager.hooks,
+      },
+    };
+    registerPlugins(registerHooks);
+    tabs.hooks.tab.tap(name, handleTab);
   }
 
   init();

@@ -1,0 +1,14 @@
+.ok > svg,
+.warning > svg,
+.fire > svg {
+  height: 16px;
+  width: 16px;
+}
+
+.ok > svg path {
+  fill: #0f0;
+}
+
+.warning > svg path {
+  fill: #fa0;
+}

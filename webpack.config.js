@@ -7,14 +7,14 @@ const paths = {
   dist: path.join(__dirname, 'dist'),
   popup: path.join(__dirname, 'src', 'popup'),
   background: path.join(__dirname, 'src', 'background'),
-  contentScripts: path.join(__dirname, 'src', 'contentScripts'),
+  contentScript: path.join(__dirname, 'src', 'contentScript'),
 };
 
 module.exports = {
   entry: {
     background: paths.background,
     popup: paths.popup,
-    contentScripts: paths.contentScripts,
+    contentScripts: paths.contentScript,
   },
   output: {
     path: paths.dist,
@@ -34,6 +34,26 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.(png|svg|jpe?g|gif)$/i,
+        type: 'asset/source',
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules: {
+                localIdentName: '[name]_[local]__[hash:base64:5]',
+              },
+            },
+          },
+          'postcss-loader',
+        ],
+      },
     ],
   },
   resolve: {
@@ -50,9 +70,6 @@ module.exports = {
               ...baseManifest,
               version: process.env.npm_package_version,
               description: process.env.npm_package_description,
-              // content_scripts: [
-              //   ...contentScriptsManifest,
-              // ],
             };
             return JSON.stringify(manifest, null, 2);
           },
