@@ -1,11 +1,17 @@
+import ChromeStorage from '../utils/browser/ChromeStorage';
+import ChromeTabs from '../utils/browser/ChromeTabs';
 import PROpenTime from '../plugins/PROpenTime/background';
 import HighlightPRTitle from '../plugins/HighlightPRTitle/background';
-import ChromeTabs from '../utils/browser/ChromeTabs';
 import PluginManager from './PluginManager';
 
-const { tabs } = chrome;
+const { tabs, storage } = chrome;
 const chromeTabs = ChromeTabs(tabs);
+const chromeStorage = ChromeStorage(storage);
+const extensions: BGPluginManager.Extensions = {
+  tabs: chromeTabs,
+  storage: chromeStorage,
+};
 const plugins: BGPluginManager.Plugins = [HighlightPRTitle(), PROpenTime()];
-PluginManager(chromeTabs, plugins);
+PluginManager(extensions, plugins);
 
 console.log('background loaded');

@@ -9,3 +9,5 @@ const chromeRuntime = ChromeRuntime(runtime);
 
 const plugins: CSPluginManager.Plugins = [HighlightPRTitle(), PROpenTime()];
 PluginManager(chromeRuntime, plugins);
+
+console.log('content script loaded');

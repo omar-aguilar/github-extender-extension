@@ -31,6 +31,7 @@ declare namespace BrowserExtensions {
     };
 
     export type Runtime = typeof chrome.runtime;
+    export type Storage = typeof chrome.storage;
   }
 
   export type SendMessageFn = <T>(data: T) => void;
@@ -62,6 +63,20 @@ declare namespace ChromeRuntime {
 
 interface ChromeRuntime {
   hooks: ChromeRuntime.Hooks;
+}
+
+declare namespace ChromeStorage {
+  export type StorageChanges = { [key: string]: chrome.storage.StorageChange };
+  export type StorageArguments = [StorageChanges];
+  export type KeyUpdated = EventHook.Hook<StorageArguments>;
+
+  export type Hooks = {
+    keyUpdated: KeyUpdated;
+  };
+}
+
+interface ChromeStorage {
+  hooks: ChromeStorage.Hooks;
 }
 
 declare namespace GithubPageManager {
@@ -105,8 +120,24 @@ declare namespace BGPluginManager {
   export type PageArguments = [ChromeTabs.ValidTab, SendPluginMessageFn];
   export type Page = EventHook.Hook<PageArguments>;
 
+  export type GithubConfig = {
+    token: string;
+  };
+  type AllGlobalConfig = {
+    github: GithubConfig;
+  };
+  export type GlobalConfig = Partial<AllGlobalConfig>;
+  export type GlobalConfigChangeArguments = [GlobalConfig];
+  export type GlobalConfigChange = EventHook.Hook<GlobalConfigChangeArguments>;
+
+  export type PluginConfig = Record<string, any>;
+  export type PluginConfigChangeArguments = [PluginConfig];
+  export type PluginConfigChange = EventHook.Hook<PluginConfigChangeArguments>;
+
   export type Hooks = {
     page: Page;
+    pluginConfigChange: PluginConfigChange;
+    globalConfigChange: PluginConfigChange;
   };
 
   export type ManagerHooks = {
@@ -122,6 +153,10 @@ declare namespace BGPluginManager {
     register: (hooks: RegisterHooks) => void;
   };
 
+  export type Extensions = {
+    tabs: ChromeTabs;
+    storage: ChromeStorage;
+  };
   export type Plugins = Plugin[];
 }
 

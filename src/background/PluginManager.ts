@@ -1,17 +1,16 @@
 import GithubPageManager from './GithubPageManager';
 import Hook from '../utils/Hook';
+import { getStorageNewChanges } from '../utils/storage';
 
-function PluginManager(tabs: ChromeTabs, plugins: BGPluginManager.Plugins): BGPluginManager {
+function PluginManager(
+  extensions: BGPluginManager.Extensions,
+  plugins: BGPluginManager.Plugins
+): BGPluginManager {
   const name = 'Background.PluginManager';
   const hooks = {
     page: Hook<BGPluginManager.PageArguments>(['tab', 'sendMessage']),
-    /**
-     * Add hooks for lifecycle
-     * onInit: () => void; hooks.init ???
-     * onLoaded: () => void; hooks.loaded ???
-     * onConfigUpdate: () => void; > hook.config
-     * onMessage: () => void; > hooks.page ✅
-     */
+    globalConfigChange: Hook<BGPluginManager.GlobalConfigChangeArguments>(['globalConfigChanges']),
+    pluginConfigChange: Hook<BGPluginManager.PluginConfigChangeArguments>(['pluginConfigChanges']),
   };
 
   function handleTab(tab: ChromeTabs.ValidTab, sendMessage: BrowserExtensions.SendMessageFn): void {
@@ -19,6 +18,29 @@ function PluginManager(tabs: ChromeTabs, plugins: BGPluginManager.Plugins): BGPl
       sendMessage({ source, event, data });
     };
     hooks.page.call(tab, sendPluginMessage);
+  }
+
+  function handleGlobalConfigChange(changes: ChromeStorage.StorageChanges): void {
+    const { globalConfig } = changes;
+    if (!globalConfig) {
+      return;
+    }
+    const newGlobalConfig = getStorageNewChanges(globalConfig) as BGPluginManager.GlobalConfig;
+    hooks.globalConfigChange.call(newGlobalConfig);
+  }
+
+  function handlePluginConfigChange(changes: ChromeStorage.StorageChanges): void {
+    const { pluginConfig } = changes;
+    if (!pluginConfig) {
+      return;
+    }
+    const newPluginConfig = getStorageNewChanges(pluginConfig);
+    hooks.pluginConfigChange.call(newPluginConfig);
+  }
+
+  function handleStorageKeyUpdate(changes: ChromeStorage.StorageChanges): void {
+    handleGlobalConfigChange(changes);
+    handlePluginConfigChange(changes);
   }
 
   function registerPlugins(registerHooks: BGPluginManager.RegisterHooks) {
@@ -36,7 +58,8 @@ function PluginManager(tabs: ChromeTabs, plugins: BGPluginManager.Plugins): BGPl
       },
     };
     registerPlugins(registerHooks);
-    tabs.hooks.tab.tap(name, handleTab);
+    extensions.tabs.hooks.tab.tap(name, handleTab);
+    extensions.storage.hooks.keyUpdated.tap(name, handleStorageKeyUpdate);
   }
 
   init();
