@@ -29,18 +29,32 @@ class App extends PureComponent<never, AppState> {
   }
 
   setGlobalConfig(globalConfig: BGPluginManager.GlobalConfig): void {
-    this.chromeStorage.actions.setKey('globalConfig', globalConfig);
+    this.setState({ globalConfig });
+    this.chromeStorage.actions
+      .setKey('globalConfig', globalConfig)
+      .then(() => {
+        this.setState({ globalConfig });
+      })
+      .catch(console.error);
   }
 
   setPluginConfig(pluginConfig: BGPluginManager.PluginConfig): void {
-    this.chromeStorage.actions.setKey('pluginConfig', pluginConfig);
+    this.chromeStorage.actions
+      .setKey('pluginConfig', pluginConfig)
+      .then(() => {
+        this.setState({ pluginConfig });
+      })
+      .catch(console.error);
   }
 
   loadConfig(): void {
-    this.chromeStorage.actions.getKeys(['globalConfig', 'pluginConfig']).then((values) => {
-      const { globalConfig = {}, pluginConfig = {} } = values;
-      this.setState({ globalConfig, pluginConfig });
-    });
+    this.chromeStorage.actions
+      .getKeys(['globalConfig', 'pluginConfig'])
+      .then((values) => {
+        const { globalConfig = {}, pluginConfig = {} } = values;
+        this.setState({ globalConfig, pluginConfig });
+      })
+      .catch(console.error);
   }
 
   render(): ReactNode {

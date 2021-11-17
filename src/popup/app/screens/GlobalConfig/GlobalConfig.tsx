@@ -1,13 +1,45 @@
-import { FunctionComponent } from 'react';
-import GithubToken from './components/GithubToken';
+import { FunctionComponent, useEffect, useState } from 'react';
+import Button from '@mui/material/Button';
+import GithubConfig from './components/GithubConfig';
+import styles from './GlobalConfig.scss';
+import useAppContext from '../../components/AppContext/useAppContext';
 
 const GlobalConfigContainer: FunctionComponent = () => {
+  const { globalConfig, setGlobalConfig } = useAppContext();
+  const [storedGlobalConfig, setStoredGlobalConfig] =
+    useState<BGPluginManager.GlobalConfig>(globalConfig);
+  const { github = {} as BGPluginManager.GithubConfig } = storedGlobalConfig;
+
+  useEffect(() => {
+    setStoredGlobalConfig(globalConfig);
+  }, [globalConfig]);
+
+  const onGithubConfigUpdate = (githubConfigUpdate: BGPluginManager.GithubConfig) => {
+    const newGlobalConfig = {
+      ...storedGlobalConfig,
+      github: {
+        ...storedGlobalConfig?.github,
+        ...githubConfigUpdate,
+      },
+    };
+    setStoredGlobalConfig(newGlobalConfig);
+  };
+
+  const handleSave = () => {
+    setGlobalConfig(storedGlobalConfig);
+  };
+
   return (
-    <>
-      <div>Global Config</div>
-      <br />
-      <GithubToken />
-    </>
+    <div className={styles.container}>
+      <div className={styles.form}>
+        <GithubConfig config={github} onConfigUpdate={onGithubConfigUpdate} />
+      </div>
+      <div className={styles.footer}>
+        <Button variant="contained" onClick={handleSave}>
+          Save Changes
+        </Button>
+      </div>
+    </div>
   );
 };
 
