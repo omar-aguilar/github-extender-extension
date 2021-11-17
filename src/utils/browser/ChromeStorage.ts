@@ -39,9 +39,9 @@ function ChromeStorage(
     });
   }
 
-  function getKey(key: string): Promise<any> {
+  function getKeys(keys: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      storage[storageArea].get(key, (value) => {
+      storage[storageArea].get(keys, (value) => {
         if (runtime.lastError) {
           reject(runtime.lastError);
           return;
@@ -57,7 +57,7 @@ function ChromeStorage(
     hooks,
     actions: {
       setKey,
-      getKey,
+      getKeys,
     },
   };
 }
