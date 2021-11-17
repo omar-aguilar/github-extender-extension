@@ -73,10 +73,16 @@ declare namespace ChromeStorage {
   export type Hooks = {
     keyUpdated: KeyUpdated;
   };
+
+  export type Actions = {
+    getKey: (key: string) => Promise<any>;
+    setKey: <T>(key: string, value: T) => Promise<boolean>;
+  };
 }
 
 interface ChromeStorage {
   hooks: ChromeStorage.Hooks;
+  actions: ChromeStorage.Actions;
 }
 
 declare namespace GithubPageManager {

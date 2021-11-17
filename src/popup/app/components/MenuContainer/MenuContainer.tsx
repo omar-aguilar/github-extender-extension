@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { useLinkClickHandler, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
@@ -9,6 +9,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MenuHeader from './MenuHeader';
+import { routes } from '../../../config/routes';
 import styles from './MenuContainer.scss';
 
 const MenuContainer: FunctionComponent = () => {
@@ -22,18 +23,6 @@ const MenuContainer: FunctionComponent = () => {
     navigate(-1);
   };
 
-  const goToGlobalConfig = (): void => {
-    navigate('/global-config');
-  };
-
-  const goToPluginConfig = (): void => {
-    navigate('/plugin-config');
-  };
-
-  const goToHome = (): void => {
-    navigate('/');
-  };
-
   return (
     <Drawer classes={drawerClasses} variant="persistent" anchor="left" open>
       <MenuHeader>
@@ -43,17 +32,17 @@ const MenuContainer: FunctionComponent = () => {
       </MenuHeader>
       <Divider />
       <List component="nav">
-        <ListItemButton onClick={goToHome}>
-          <ListItemText primary="Home" />
+        <ListItemButton component={Link} to={routes.HOME.path}>
+          <ListItemText primary={routes.HOME.title} />
         </ListItemButton>
       </List>
       <Divider />
       <List component="nav" subheader={<ListSubheader>Settings</ListSubheader>}>
-        <ListItemButton onClick={goToGlobalConfig}>
-          <ListItemText primary="Global Config" />
+        <ListItemButton component={Link} to={routes.GLOBAL_CONFIG.path}>
+          <ListItemText primary={routes.GLOBAL_CONFIG.title} />
         </ListItemButton>
-        <ListItemButton onClick={goToPluginConfig}>
-          <ListItemText primary="Plugin Config" />
+        <ListItemButton component={Link} to={routes.PLUGIN_CONFIG.path}>
+          <ListItemText primary={routes.PLUGIN_CONFIG.title} />
         </ListItemButton>
       </List>
     </Drawer>

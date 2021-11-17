@@ -4,9 +4,9 @@ import PROpenTime from '../plugins/PROpenTime/background';
 import HighlightPRTitle from '../plugins/HighlightPRTitle/background';
 import PluginManager from './PluginManager';
 
-const { tabs, storage } = chrome;
+const { tabs, storage, runtime } = chrome;
 const chromeTabs = ChromeTabs(tabs);
-const chromeStorage = ChromeStorage(storage);
+const chromeStorage = ChromeStorage(storage, runtime);
 const extensions: BGPluginManager.Extensions = {
   tabs: chromeTabs,
   storage: chromeStorage,

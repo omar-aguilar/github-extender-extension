@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 import clsx from 'clsx';
 import AppHeader from './components/AppHeader';
 import ContentContainer from './components/ContentContainer';

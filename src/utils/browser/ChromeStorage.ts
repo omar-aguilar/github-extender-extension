@@ -1,9 +1,13 @@
 import Hook from '../Hook';
 
-function ChromeStorage(storage: BrowserExtensions.Chrome.Storage): ChromeStorage {
+function ChromeStorage(
+  storage: BrowserExtensions.Chrome.Storage,
+  runtime: BrowserExtensions.Chrome.Runtime
+): ChromeStorage {
   const hooks = {
     keyUpdated: Hook<ChromeStorage.StorageArguments>(['changes']),
   };
+  const storageArea = 'local';
 
   function onKeyUpdated(changes: ChromeStorage.StorageChanges): void {
     hooks.keyUpdated.call(changes);
@@ -11,10 +15,39 @@ function ChromeStorage(storage: BrowserExtensions.Chrome.Storage): ChromeStorage
 
   function init() {
     storage.onChanged.addListener((changes, area) => {
-      if (area !== 'local') {
+      if (area !== storageArea) {
         return;
       }
       onKeyUpdated(changes);
+    });
+  }
+
+  function setKey<T>(key: string, value: T): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      storage[storageArea].set(
+        {
+          [key]: value,
+        },
+        () => {
+          if (runtime.lastError) {
+            reject(runtime.lastError);
+            return;
+          }
+          resolve(true);
+        }
+      );
+    });
+  }
+
+  function getKey(key: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      storage[storageArea].get(key, (value) => {
+        if (runtime.lastError) {
+          reject(runtime.lastError);
+          return;
+        }
+        resolve(value);
+      });
     });
   }
 
@@ -22,6 +55,10 @@ function ChromeStorage(storage: BrowserExtensions.Chrome.Storage): ChromeStorage
 
   return {
     hooks,
+    actions: {
+      setKey,
+      getKey,
+    },
   };
 }
 

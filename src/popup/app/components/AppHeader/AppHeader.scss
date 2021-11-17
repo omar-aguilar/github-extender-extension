@@ -1,3 +1,18 @@
 .toolbar {
   font-size: 16px;
 }
+
+.title {
+  & .app-section::before {
+    color: rgba(255, 255, 255, 70%);
+    content: ' / ';
+  }
+
+  & .app-section {
+    color: rgba(255, 255, 255, 70%);
+    font-size: 14px;
+    font-weight: bolder;
+    text-transform: uppercase;
+    word-spacing: 0.3em;
+  }
+}

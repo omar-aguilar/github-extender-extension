@@ -4,6 +4,7 @@
     "selector-pseudo-class-no-unknown": [true, {
       "ignorePseudoClasses": ["global", "local"]
     }],
-    "scss/selector-no-redundant-nesting-selector": null
+    "scss/selector-no-redundant-nesting-selector": null,
+    "color-function-notation": "legacy"
   }
 }
