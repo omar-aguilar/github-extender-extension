@@ -7,7 +7,8 @@
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
     "lint": "eslint --color --ext .js,.ts,.tsx src *.js .eslintrc.js",
-    "stylelint": "stylelint src/**/*.scss",
+    "stylelint": "stylelint \"src/**/*.scss\"",
+    "stylelint:fix": "stylelint \"src/**/*.scss\" --fix",
     "ts:check-types": "tsc",
     "verify": "npm run lint && npm run ts:check-types && npm run stylelint",
     "watch": "webpack --mode development --watch"
@@ -67,7 +68,7 @@
     "style-loader": "^3.3.1",
     "stylelint": "^14.0.1",
     "stylelint-config-sass-guidelines": "^9.0.1",
-    "stylelint-config-standard": "^23.0.0",
+    "stylelint-config-standard": "^24.0.0",
     "typescript": "^4.4.2",
     "webpack": "^5.51.1",
     "webpack-cli": "^4.8.0"
