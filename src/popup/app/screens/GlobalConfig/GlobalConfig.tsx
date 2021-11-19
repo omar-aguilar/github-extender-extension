@@ -17,15 +17,20 @@ const GlobalConfigContainer: FunctionComponent = () => {
     setStoredGlobalConfig(globalConfig);
   }, [globalConfig]);
 
-  const onGithubConfigUpdate = (githubConfigUpdate: BGPluginManager.GithubConfig) => {
+  const onGlobalConfigChange = (changes: BGPluginManager.GlobalConfig) => {
     const newGlobalConfig = {
       ...storedGlobalConfig,
-      github: {
-        ...storedGlobalConfig?.github,
-        ...githubConfigUpdate,
-      },
+      ...changes,
     };
     setStoredGlobalConfig(newGlobalConfig);
+  };
+
+  const onGithubConfigUpdate = (githubConfigUpdate: BGPluginManager.GithubConfig) => {
+    const newGithubConfig = {
+      ...storedGlobalConfig?.github,
+      ...githubConfigUpdate,
+    };
+    onGlobalConfigChange({ github: newGithubConfig });
   };
 
   const handleSave = () => {
