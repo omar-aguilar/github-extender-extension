@@ -1,9 +1,13 @@
 import { merge } from 'ramda';
 import { HOOK_NAMES } from './hooks';
 import { PLUGIN_NAME } from './constants';
-import { HighlightPRTitleConfig, HighlightPRTitleConfigMessage } from './types';
+import {
+  HighlightPRTitleConfig,
+  HighlightPRTitlePartialConfig,
+  HighlightPRTitleConfigMessage,
+} from './types';
 
-function background(config?: HighlightPRTitleConfig): BGPluginManager.Plugin {
+function background(config?: HighlightPRTitlePartialConfig): BGPluginManager.Plugin {
   const name = PLUGIN_NAME;
 
   const baseConfig: HighlightPRTitleConfig = {

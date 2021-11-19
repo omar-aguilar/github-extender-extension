@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare namespace EventHook {
   export type FixedSizeArray<T extends number, U> = T extends 0
     ? void[]
@@ -200,8 +201,8 @@ interface CSPluginManager {
 
 declare namespace ExtensionExtender {
   export type PluginConfig = {
-    background: <T>(config?: T) => BGPluginManager.Plugin;
-    contentScript: <T>(config?: T) => CSPluginManager.Plugin;
+    background: () => BGPluginManager.Plugin;
+    contentScript: () => CSPluginManager.Plugin;
   };
 
   export type Configuration = {

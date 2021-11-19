@@ -1,9 +1,10 @@
 import HighlightPRTitleBG from './background';
 import HighlightPRTitleCS from './contentScript';
+import { HighlightPRTitlePartialConfig } from './types';
 
-function HighlightPRTitle(): ExtensionExtender.PluginConfig {
+function HighlightPRTitle(config?: HighlightPRTitlePartialConfig): ExtensionExtender.PluginConfig {
   return {
-    background: HighlightPRTitleBG,
+    background: () => HighlightPRTitleBG(config),
     contentScript: HighlightPRTitleCS,
   };
 }

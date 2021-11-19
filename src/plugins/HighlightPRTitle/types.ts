@@ -14,3 +14,5 @@ export type HighlightPRTitleConfigMessage = BaseConfig & RepoConfig;
 export type HighlightPRTitleConfig = BaseConfig & {
   repoConfig: RepoConfig[];
 };
+
+export type HighlightPRTitlePartialConfig = Partial<HighlightPRTitleConfig>;
