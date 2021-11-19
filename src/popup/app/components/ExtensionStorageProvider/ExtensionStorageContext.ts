@@ -1,17 +1,17 @@
 import { createContext } from 'react';
 
-export type AppContextProps = {
+export type ExtensionStorageContextProps = {
   globalConfig: BGPluginManager.GlobalConfig;
   pluginConfig: BGPluginManager.PluginConfig;
   setGlobalConfig: (config: BGPluginManager.GlobalConfig) => void;
   setPluginConfig: (config: BGPluginManager.PluginConfig) => void;
 };
 
-const AppContext = createContext<AppContextProps>({
+const ExtensionStorageContext = createContext<ExtensionStorageContextProps>({
   globalConfig: {},
   pluginConfig: {},
   setGlobalConfig: () => {},
   setPluginConfig: () => {},
 });
 
-export default AppContext;
+export default ExtensionStorageContext;

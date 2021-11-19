@@ -2,12 +2,12 @@ import { FunctionComponent, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import GithubConfig from './components/GithubConfig';
 import styles from './GlobalConfig.scss';
-import useAppContext from '../../components/AppContext/useAppContext';
+import { useExtensionStorageContext } from '../../components/ExtensionStorageProvider';
 import useNotificationContext from '../../components/NotificationProvider/useNotificationContext';
 import { addNotification } from '../../components/NotificationProvider/store';
 
 const GlobalConfigContainer: FunctionComponent = () => {
-  const { globalConfig, setGlobalConfig } = useAppContext();
+  const { globalConfig, setGlobalConfig } = useExtensionStorageContext();
   const [, dispatch] = useNotificationContext();
   const [storedGlobalConfig, setStoredGlobalConfig] =
     useState<BGPluginManager.GlobalConfig>(globalConfig);
