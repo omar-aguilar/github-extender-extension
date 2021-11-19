@@ -8,17 +8,15 @@ import ListSubheader from '@mui/material/ListSubheader';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { pathOr } from 'ramda';
 import MenuHeader from './MenuHeader';
-import { routes } from '../../../config/routes';
+import { routes, getStateFromLocation } from '../../../config/routes';
 import styles from './MenuContainer.scss';
 
 const MenuContainer: FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // TODO: move background location to its own constant
-  const backgroundPathName = pathOr('', ['state', 'backgroundLocation', 'pathname'], location);
+  const state = getStateFromLocation(location);
+  const backgroundPathName = state?.backgroundLocation?.pathname || '';
   const isPathnameInBackground = (pathname: string): boolean => {
     return backgroundPathName === pathname;
   };

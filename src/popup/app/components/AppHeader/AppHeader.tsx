@@ -1,11 +1,15 @@
 import { FunctionComponent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { pathOr } from 'ramda';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { routes, getRouteConfigByPath } from '../../../config/routes';
+import {
+  routes,
+  getRouteConfigByPath,
+  LocationState,
+  getStateFromLocation,
+} from '../../../config/routes';
 import styles from './AppHeader.scss';
 
 const AppHeader: FunctionComponent = () => {
@@ -20,14 +24,14 @@ const AppHeader: FunctionComponent = () => {
   };
 
   const onMenuIconClick = (): void => {
-    navigate(routes.MENU.path, {
-      state: {
-        backgroundLocation: location,
-      },
-    });
+    const state: LocationState = {
+      backgroundLocation: location,
+    };
+    navigate(routes.MENU.path, { state });
   };
 
-  const currentContentLocation = pathOr(location, ['state', 'backgroundLocation'], location);
+  const state = getStateFromLocation(location);
+  const currentContentLocation = state?.backgroundLocation || location;
   const routeConfig = getRouteConfigByPath(currentContentLocation.pathname);
   const { title } = document;
   const section = routeConfig?.title;

@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { routes } from '../../../config/routes';
+import { routes, getStateFromLocation } from '../../../config/routes';
 import ScreenContainer from '../ScreenContainer';
 import GlobalConfigScreen from '../../screens/GlobalConfig';
 import PluginConfigScreen from '../../screens/PluginConfig';
@@ -8,13 +8,9 @@ import HomeScreen from '../../screens/Home';
 import NotFoundScreen from '../../screens/NotFound';
 import MenuScreen from '../../screens/Menu';
 
-type LocationState = {
-  backgroundLocation?: Location;
-};
-
 const RoutesContainer: FunctionComponent = () => {
   const location = useLocation();
-  const state = (location.state || {}) as LocationState;
+  const state = getStateFromLocation(location);
   const { backgroundLocation } = state;
   return (
     <>
