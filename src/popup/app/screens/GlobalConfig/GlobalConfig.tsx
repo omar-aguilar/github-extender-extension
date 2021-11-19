@@ -3,9 +3,12 @@ import Button from '@mui/material/Button';
 import GithubConfig from './components/GithubConfig';
 import styles from './GlobalConfig.scss';
 import useAppContext from '../../components/AppContext/useAppContext';
+import useNotificationContext from '../../components/NotificationProvider/useNotificationContext';
+import { addNotification } from '../../components/NotificationProvider/store';
 
 const GlobalConfigContainer: FunctionComponent = () => {
   const { globalConfig, setGlobalConfig } = useAppContext();
+  const [, dispatch] = useNotificationContext();
   const [storedGlobalConfig, setStoredGlobalConfig] =
     useState<BGPluginManager.GlobalConfig>(globalConfig);
   const { github = {} as BGPluginManager.GithubConfig } = storedGlobalConfig;
@@ -27,6 +30,7 @@ const GlobalConfigContainer: FunctionComponent = () => {
 
   const handleSave = () => {
     setGlobalConfig(storedGlobalConfig);
+    dispatch(addNotification({ message: 'Saved Global Config', type: 'success' }));
   };
 
   return (

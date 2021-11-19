@@ -22,20 +22,15 @@ function ChromeStorage(
     });
   }
 
-  function setKey<T>(key: string, value: T): Promise<boolean> {
+  function setKey<T>(key: string, value: T): Promise<void | chrome.runtime.LastError> {
     return new Promise((resolve, reject) => {
-      storage[storageArea].set(
-        {
-          [key]: value,
-        },
-        () => {
-          if (runtime.lastError) {
-            reject(runtime.lastError);
-            return;
-          }
-          resolve(true);
+      storage[storageArea].set({ [key]: value }, () => {
+        if (runtime.lastError) {
+          reject(runtime.lastError);
+          return;
         }
-      );
+        resolve();
+      });
     });
   }
 

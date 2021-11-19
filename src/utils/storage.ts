@@ -1,6 +1,10 @@
 import { equals, not, pick } from 'ramda';
 
-// eslint-disable-next-line import/prefer-default-export
+export const storageKeys = {
+  GLOBAL_CONFIG: 'globalConfig',
+  PLUGIN_CONFIG: 'pluginConfig',
+};
+
 export function getStorageNewChanges(
   storageValue: chrome.storage.StorageChange
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

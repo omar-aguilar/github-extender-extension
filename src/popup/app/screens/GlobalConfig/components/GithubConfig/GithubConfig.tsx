@@ -2,17 +2,21 @@ import { FunctionComponent } from 'react';
 import GithubToken from '../GithubToken';
 
 type GithubConfigProps = {
-  config?: BGPluginManager.GithubConfig;
+  config: BGPluginManager.GithubConfig;
   onConfigUpdate: (githubConfigUpdate: BGPluginManager.GithubConfig) => void;
 };
 
 const GithubConfig: FunctionComponent<GithubConfigProps> = ({ config, onConfigUpdate }) => {
-  const onGithubTokenChange = (token: string) => {
-    const newConfig = {
+  const onGithubConfigChange = (changes: Partial<BGPluginManager.GithubConfig>): void => {
+    const newConfig: BGPluginManager.GithubConfig = {
       ...config,
-      token,
+      ...changes,
     };
     onConfigUpdate(newConfig);
+  };
+
+  const onGithubTokenChange = (token: string) => {
+    onGithubConfigChange({ token });
   };
 
   return <GithubToken token={config?.token} onChange={onGithubTokenChange} />;

@@ -76,7 +76,7 @@ declare namespace ChromeStorage {
 
   export type Actions = {
     getKeys: (keys: string[]) => Promise<any>;
-    setKey: <T>(key: string, value: T) => Promise<boolean>;
+    setKey: <T>(key: string, value: T) => Promise<void | chrome.runtime.LastError>;
   };
 }
 

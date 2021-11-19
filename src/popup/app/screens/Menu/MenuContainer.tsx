@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
@@ -8,12 +8,21 @@ import ListSubheader from '@mui/material/ListSubheader';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { pathOr } from 'ramda';
 import MenuHeader from './MenuHeader';
 import { routes } from '../../../config/routes';
 import styles from './MenuContainer.scss';
 
 const MenuContainer: FunctionComponent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // TODO: move background location to its own constant
+  const backgroundPathName = pathOr('', ['state', 'backgroundLocation', 'pathname'], location);
+  const isPathnameInBackground = (pathname: string): boolean => {
+    return backgroundPathName === pathname;
+  };
+
   const drawerClasses = {
     root: styles.root,
     paper: styles.paper,
@@ -32,16 +41,28 @@ const MenuContainer: FunctionComponent = () => {
       </MenuHeader>
       <Divider />
       <List component="nav">
-        <ListItemButton component={Link} to={routes.HOME.path}>
+        <ListItemButton
+          component={Link}
+          to={routes.HOME.path}
+          selected={isPathnameInBackground(routes.HOME.path)}
+        >
           <ListItemText primary={routes.HOME.title} />
         </ListItemButton>
       </List>
       <Divider />
       <List component="nav" subheader={<ListSubheader>Settings</ListSubheader>}>
-        <ListItemButton component={Link} to={routes.GLOBAL_CONFIG.path}>
+        <ListItemButton
+          component={Link}
+          to={routes.GLOBAL_CONFIG.path}
+          selected={isPathnameInBackground(routes.GLOBAL_CONFIG.path)}
+        >
           <ListItemText primary={routes.GLOBAL_CONFIG.title} />
         </ListItemButton>
-        <ListItemButton component={Link} to={routes.PLUGIN_CONFIG.path}>
+        <ListItemButton
+          component={Link}
+          to={routes.PLUGIN_CONFIG.path}
+          selected={isPathnameInBackground(routes.PLUGIN_CONFIG.path)}
+        >
           <ListItemText primary={routes.PLUGIN_CONFIG.title} />
         </ListItemButton>
       </List>
