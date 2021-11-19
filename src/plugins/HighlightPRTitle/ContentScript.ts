@@ -1,27 +1,26 @@
 import hooks from './hooks';
 import { PLUGIN_NAME } from './constants';
+import { HighlightPRTitleConfigMessage } from './types';
 
 function contentScript(): CSPluginManager.Plugin {
   const name = PLUGIN_NAME;
 
-  function highlight(elem: HTMLElement, data: any): void {
-    const { styles } = data;
+  function highlight(elem: HTMLElement, data: HighlightPRTitleConfigMessage): void {
+    const { styles, titleRegexp } = data;
     const { style } = elem;
     const title = elem.querySelector('a')?.innerText || '';
-
-    const match = '^(?:\\[[A-Za-z0-9]+-[A-Za-z0-9]+\\])+\\s[A-Z]';
-    const regex = RegExp(match);
+    const regex = RegExp(titleRegexp);
     if (regex.test(title)) {
       return;
     }
 
-    (Object.keys(styles) as Array<any>).forEach((key) => {
-      style[key] = styles[key];
+    styles.forEach((setPropertyParams) => {
+      style.setProperty(...setPropertyParams);
     });
   }
 
-  function handleConfig(data: any): void {
-    const selector = '.Box-row.js-issue-row';
+  function handleConfig(data: HighlightPRTitleConfigMessage): void {
+    const { selector } = data;
     document.querySelectorAll<HTMLElement>(selector).forEach((elem) => {
       highlight(elem, data);
     });
