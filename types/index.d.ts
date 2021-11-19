@@ -198,6 +198,26 @@ interface CSPluginManager {
   hooks: CSPluginManager.Hooks;
 }
 
+declare namespace ExtensionExtender {
+  export type PluginConfig = {
+    background: <T>(config?: T) => BGPluginManager.Plugin;
+    contentScript: <T>(config?: T) => CSPluginManager.Plugin;
+  };
+
+  export type Configuration = {
+    plugins: ExtensionExtender.PluginConfig[];
+  };
+}
+
+interface ExtensionExtender {
+  background: () => BGPluginManager.Plugin[];
+  contentScript: () => CSPluginManager.Plugin[];
+}
+
+interface ImportWebComponent {
+  default: CustomElementConstructor;
+}
+
 declare module '*.svg' {
   const value: any;
   export = value;

@@ -1,7 +1,7 @@
 import hooks from './hooks';
 import { PLUGIN_NAME } from './constants';
 
-function HighlightPRTitle(): CSPluginManager.Plugin {
+function contentScript(): CSPluginManager.Plugin {
   const name = PLUGIN_NAME;
 
   function highlight(elem: HTMLElement, data: any): void {
@@ -37,4 +37,4 @@ function HighlightPRTitle(): CSPluginManager.Plugin {
   };
 }
 
-export default HighlightPRTitle;
+export default contentScript;

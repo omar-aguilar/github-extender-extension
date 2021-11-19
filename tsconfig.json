@@ -3,6 +3,7 @@
     "target": "ESNext",
     "strict": true,
     "sourceMap": true,
+    "module": "esnext",
     "noEmit": true,
     "jsx": "react-jsx",
     "allowJs": true,

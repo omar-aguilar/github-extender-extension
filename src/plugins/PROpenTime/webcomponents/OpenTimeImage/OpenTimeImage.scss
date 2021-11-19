@@ -6,9 +6,16 @@
 }
 
 .ok > svg path {
-  fill: #0f0;
+  fill: #2c2;
 }
 
 .warning > svg path {
   fill: #fa0;
+}
+
+.meter-container {
+  align-items: center;
+  display: inline-flex;
+  margin: 0 8px;
+  position: relative;
 }

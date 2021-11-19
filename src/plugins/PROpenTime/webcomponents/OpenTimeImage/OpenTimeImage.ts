@@ -21,7 +21,7 @@ function getOpenTimeImage(percentage: number): HTMLSpanElement {
 }
 
 class OpenTimeImage extends HTMLElement {
-  connectedCallback() {
+  connectedCallback(): void {
     const maxDaysAttr = this.getAttribute('max-days');
     const openAt = this.getAttribute('datetime');
     if (!maxDaysAttr || !openAt) {
@@ -38,10 +38,7 @@ class OpenTimeImage extends HTMLElement {
     const expiredPercentage = Math.min(100, (elapsedTime * 100) / offsetTop);
 
     const meterContainer = document.createElement('span');
-    meterContainer.style.position = 'relative';
-    meterContainer.style.display = 'inline-flex';
-    meterContainer.style.alignItems = 'center';
-    meterContainer.style.margin = '0 8px';
+    meterContainer.classList.add(styles['meter-container']);
 
     const expiredImage = getOpenTimeImage(expiredPercentage);
     meterContainer.appendChild(expiredImage);
@@ -50,4 +47,4 @@ class OpenTimeImage extends HTMLElement {
   }
 }
 
-customElements.define('open-time-img', OpenTimeImage);
+export default OpenTimeImage;

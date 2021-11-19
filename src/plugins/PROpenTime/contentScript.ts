@@ -1,9 +1,10 @@
 import hooks from './hooks';
+import { registerWebComponent } from '../../utils/webcomponents';
 import { PLUGIN_NAME } from './constants';
-import './components/OpenTimeImage';
 
-function PROpenTime(): CSPluginManager.Plugin {
+function contentScript(): CSPluginManager.Plugin {
   const name = PLUGIN_NAME;
+  registerWebComponent('open-time-img', import('./webcomponents/OpenTimeImage'));
 
   function addMark(elem: HTMLElement, data: any): void {
     const markClassName = 'gee-open-time-container';
@@ -40,4 +41,4 @@ function PROpenTime(): CSPluginManager.Plugin {
   };
 }
 
-export default PROpenTime;
+export default contentScript;

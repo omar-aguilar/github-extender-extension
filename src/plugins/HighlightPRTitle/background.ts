@@ -1,7 +1,7 @@
 import { HOOK_NAMES } from './hooks';
 import { PLUGIN_NAME } from './constants';
 
-function HighlightPRTitle(): BGPluginManager.Plugin {
+function background(): BGPluginManager.Plugin {
   const name = PLUGIN_NAME;
   const styles = {
     backgroundColor: 'rgba(255, 0, 0, 0.1)',
@@ -23,4 +23,4 @@ function HighlightPRTitle(): BGPluginManager.Plugin {
   };
 }
 
-export default HighlightPRTitle;
+export default background;

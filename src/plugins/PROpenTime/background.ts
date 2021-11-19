@@ -1,7 +1,7 @@
 import { HOOK_NAMES } from './hooks';
 import { PLUGIN_NAME } from './constants';
 
-function PROpenTime(): BGPluginManager.Plugin {
+function background(): BGPluginManager.Plugin {
   const name = PLUGIN_NAME;
   const maxDays = 7;
 
@@ -21,4 +21,4 @@ function PROpenTime(): BGPluginManager.Plugin {
   };
 }
 
-export default PROpenTime;
+export default background;
